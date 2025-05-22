@@ -154,9 +154,10 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="Controls\RowModal.ascx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Listagem.aspx" />
+    <Content Include="Pages\Listagem.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -223,17 +224,24 @@
     <Content Include="Bundle.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\RowModal.ascx.cs">
+      <DependentUpon>RowModal.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\RowModal.ascx.designer.cs">
+      <DependentUpon>RowModal.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Data\DatabaseHelper.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Listagem.aspx.cs">
+    <Compile Include="Pages\Listagem.aspx.cs">
       <DependentUpon>Listagem.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Listagem.aspx.designer.cs">
+    <Compile Include="Pages\Listagem.aspx.designer.cs">
       <DependentUpon>Listagem.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
