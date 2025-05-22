@@ -1,15 +1,12 @@
-﻿using ESIGWeb.Data;
-using ESIGWeb.Models;
-using System;
+﻿using System;
 using System.Data;
-using System.Web.Script.Serialization;
-using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using ESIGWeb.Data;
 
 namespace ESIGWeb
 {
-    public partial class Listagem : System.Web.UI.Page
+    public partial class Listagem : Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -19,7 +16,7 @@ namespace ESIGWeb
 
         private void CarregarDados()
         {
-            DataTable dt = DatabaseHelper.ObterPessoasSalarios();
+            var dt = DatabaseHelper.ObterPessoasSalarios();
             gridPessoas.DataSource = dt;
             gridPessoas.DataBind();
         }
@@ -30,25 +27,17 @@ namespace ESIGWeb
             CarregarDados();
         }
 
-
-        [WebMethod]
-        public static Pessoa GetPessoa(int pessoaId)
-        {
-            return DatabaseHelper.ObterPessoa(pessoaId);
-        }
-
         protected void gridPessoas_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            if (e.Row.RowType == DataControlRowType.DataRow)
-            {
-                // Garantir que o DataField seja "pessoa_id"
-                var id = DataBinder.Eval(e.Row.DataItem, "pessoa_id");
-                e.Row.Attributes["data-pessoa-id"] = id?.ToString() ?? "";
-                // opcional: classe para estilizar
-                e.Row.CssClass += " data-row";
-            }
-        }
+            if (e.Row.RowType != DataControlRowType.DataRow) return;
 
+            var id = DataBinder.Eval(e.Row.DataItem, "pessoa_id")?.ToString();
+            e.Row.Attributes["data-pessoa-id"] = id;
+            e.Row.CssClass += " data-row";
+            e.Row.Attributes["onclick"] =
+                $"__doPostBack('{RowModal1.UniqueID}','{id}')";
+            e.Row.Style["cursor"] = "pointer";
+        }
 
         protected void btnCalcular_Click(object sender, EventArgs e)
         {
