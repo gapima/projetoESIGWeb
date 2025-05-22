@@ -50,6 +50,7 @@
                 <asp:BoundField DataField="salario_bruto" HeaderText="Salário Bruto" DataFormatString="{0:C}" />
                 <asp:BoundField DataField="descontos" HeaderText="Descontos" DataFormatString="{0:C}" />
                 <asp:BoundField DataField="salario_liquido" HeaderText="Salário Líquido" DataFormatString="{0:C}" />
+                <asp:BoundField DataField="nome_cargo" HeaderText="Cargo" />
             </Columns>
         </asp:GridView>
 

@@ -22,7 +22,7 @@ namespace ESIGWeb.Data
             using (var conn = new OracleConnection(ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new OracleCommand("calcular_salarios", conn))
+                using (var cmd = new OracleCommand("SP_CALCULAR_SALARIOS", conn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.ExecuteNonQuery();
@@ -44,13 +44,16 @@ namespace ESIGWeb.Data
 
                 const string sql = @"
                     SELECT
-                        pessoa_id,
-                        nome,
-                        salario_bruto,
-                        descontos,
-                        salario_liquido
-                    FROM pessoa_salario
-                    ORDER BY pessoa_id";
+                        ps.pessoa_id,
+                        ps.nome,
+                        ps.salario_bruto,
+                        ps.descontos,
+                        ps.salario_liquido,
+                        c.nome     AS nome_cargo
+                    FROM pessoa_salario ps
+                    LEFT JOIN pessoa        p ON p.id = ps.pessoa_id
+                    LEFT JOIN cargo         c ON c.id = p.cargo_id
+                    ORDER BY ps.pessoa_id";
 
                 using (var cmd = new OracleCommand(sql, conn))
                 using (var adapter = new OracleDataAdapter(cmd))
