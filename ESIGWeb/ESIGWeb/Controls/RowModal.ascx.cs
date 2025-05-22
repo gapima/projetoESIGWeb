@@ -8,30 +8,29 @@ namespace ESIGWeb.Controls
 {
     public partial class RowModal : UserControl, IPostBackEventHandler
     {
-        protected HtmlGenericControl lblPessoaId;
-        protected HtmlGenericControl lblPessoaNome;
-        protected HtmlGenericControl lblCargoId;
-        protected HtmlGenericControl lblCargoNome;
-
-        // Recebe o pessoaId do __doPostBack
         public void RaisePostBackEvent(string eventArgument)
         {
             if (!int.TryParse(eventArgument, out var pessoaId))
                 return;
 
             var p = DatabaseHelper.ObterPessoa(pessoaId);
-            if (p == null)
-                return;
+            if (p == null) return;
 
-            // Preenche os spans server-side
-            lblPessoaId.InnerText = p.Id.ToString();
-            lblPessoaNome.InnerText = p.Nome;
-            lblCargoId.InnerText = p.CargoId.ToString();
-            lblCargoNome.InnerText = p.CargoNome;
+            // Preenche os campos no server-side
+            txtPessoaId.Text = p.Id.ToString();
+            txtPessoaNome.Text = p.Nome;
+            txtDataNascimento.Text = p.DataNascimento.ToString("yyyy-MM-dd");
+            txtEmail.Text = p.Email;
+            txtUsuario.Text = p.Usuario;
+            txtCidade.Text = p.Cidade;
+            txtCEP.Text = p.CEP;
+            txtEndereco.Text = p.Endereco;
+            txtPais.Text = p.Pais;
+            txtTelefone.Text = p.Telefone;
 
-            // Injeta o script de abertura da modal após todo o HTML ter sido renderizado
+            // Abre a modal
             Page.ClientScript.RegisterStartupScript(
-                this.GetType(),
+                GetType(),
                 "showRowModal",
                 "new bootstrap.Modal(document.getElementById('rowModal')).show();",
                 true

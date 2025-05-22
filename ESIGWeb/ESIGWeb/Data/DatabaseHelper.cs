@@ -71,6 +71,14 @@ namespace ESIGWeb.Data
             const string sql = @"
                 SELECT p.id AS Id,
                        p.nome AS Nome,
+                       p.Cidade AS Cidade,
+                       p.Email AS Email,
+                       p.CEP AS CEP,
+                       p.Endereco AS Endereco,
+                       p.Pais AS Pais,
+                       p.Usuario AS Usuario,
+                       p.Telefone AS Telefone,
+                       p.Data_Nascimento AS DataNascimento,
                        c.id AS CargoId,
                        c.nome AS CargoNome
                   FROM pessoa p
@@ -93,8 +101,16 @@ namespace ESIGWeb.Data
                         {
                             Id = rdr.GetInt32(0),
                             Nome = rdr.GetString(1),
-                            CargoId = rdr.GetInt32(2),
-                            CargoNome = rdr.GetString(3)
+                            Cidade = rdr.GetString(2),
+                            Email = rdr.GetString(3),
+                            CEP = rdr.GetString(4),
+                            Endereco = rdr.GetString(5),
+                            Pais = rdr.GetString(6),
+                            Usuario = rdr.GetString(7),
+                            Telefone = rdr.GetString(8),
+                            DataNascimento = rdr.GetDateTime(9),
+                            CargoId = rdr.GetInt32(10),
+                            CargoNome = rdr.GetString(11)
                         };
                     }
                     else
