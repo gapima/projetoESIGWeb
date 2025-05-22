@@ -63,3 +63,47 @@
   </form>
 </body>
 </html>
+
+<!-- Scripts Bootstrap já existentes -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script de validação de CEP -->
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // Captura o botão OK e os inputs do RowModal
+        var btnOk = document.getElementById('<%= RowModal1.FindControl("btnValidateCep").ClientID %>');
+      var txtCep = document.getElementById('<%= RowModal1.FindControl("txtCEP").ClientID %>');
+    var txtEndereco = document.getElementById('<%= RowModal1.FindControl("txtEndereco").ClientID %>');
+    var txtCidade = document.getElementById('<%= RowModal1.FindControl("txtCidade").ClientID %>');
+
+      // Handler de clique
+      btnOk.addEventListener('click', function (e) {
+          e.preventDefault();  // evita qualquer postback
+          var cep = txtCep.value.replace(/\D/g, '');
+          if (cep.length !== 8) {
+              alert('O CEP deve ter exatamente 8 dígitos.');
+              return;
+          }
+          txtEndereco.value = 'Buscando…';
+          txtCidade.value = '';
+          fetch('https://brasilapi.com.br/api/cep/v1/' + cep)
+              .then(function (resp) {
+                  if (!resp.ok) throw resp;
+                  return resp.json();
+              })
+              .then(function (data) {
+                  txtCidade.value = data.city || '';
+                  var parts = [];
+                  if (data.street) parts.push(data.street);
+                  if (data.neighborhood) parts.push(data.neighborhood);
+                  if (data.state) parts.push(data.state);
+                  txtEndereco.value = parts.join(', ');
+              })
+              .catch(function () {
+                  alert('CEP inválido ou não encontrado.');
+                  txtEndereco.value = '';
+                  txtCidade.value = '';
+              });
+      });
+  });
+</script>

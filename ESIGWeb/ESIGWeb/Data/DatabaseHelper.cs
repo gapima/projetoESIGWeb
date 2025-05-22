@@ -120,5 +120,30 @@ namespace ESIGWeb.Data
                 }
             }
         }
+
+        public static DataTable ObterTodosCargos()
+        {
+            var dt = new DataTable();
+
+            using (var conn = new OracleConnection(ConnectionString))
+            {
+                conn.Open();
+
+                const string sql = @"
+                    SELECT
+                        id,
+                        nome
+                    FROM cargo
+                    ORDER BY id";
+
+                using (var cmd = new OracleCommand(sql, conn))
+                using (var adapter = new OracleDataAdapter(cmd))
+                {
+                    adapter.Fill(dt);
+                }
+            }
+
+            return dt;
+        }
     }
 }

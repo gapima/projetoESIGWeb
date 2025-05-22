@@ -1,12 +1,16 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="RowModal.ascx.cs" Inherits="ESIGWeb.Controls.RowModal" %>
 
 <div class="modal fade" id="rowModal" tabindex="-1" aria-labelledby="rowModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl"><!-- modal extra‐wide -->
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
+
+      <!-- Cabeçalho -->
       <div class="modal-header">
         <h5 class="modal-title" id="rowModalLabel">Detalhes da Pessoa</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
+
+      <!-- Corpo -->
       <div class="modal-body">
         <ul class="nav nav-tabs" role="tablist">
           <li class="nav-item">
@@ -18,12 +22,14 @@
         </ul>
 
         <div class="tab-content mt-3">
+
           <!-- Aba Pessoa -->
           <div class="tab-pane fade show active" id="panePessoa">
             <asp:ValidationSummary runat="server" CssClass="alert alert-danger" HeaderText="Corrija os erros abaixo:" />
 
             <div class="row gx-3 gy-2">
-              <!-- Coluna 1: Dados da Pessoa -->
+
+              <!-- Dados da Pessoa -->
               <div class="col-md-6">
                 <h6>Dados da Pessoa</h6>
 
@@ -84,45 +90,76 @@
                 </div>
               </div>
 
-            <!-- Coluna 2: Endereço & Contato -->
-            <div class="col-md-6">
+              <!-- Endereço & Contato -->
+              <div class="col-md-6">
                 <h6>Endereço & Contato</h6>
 
                 <div class="mb-2 row">
-                <label class="col-sm-4 col-form-label" for="txtCidade">Cidade:</label>
-                <div class="col-sm-8">
+                  <label class="col-sm-4 col-form-label" for="txtCidade">Cidade:</label>
+                  <div class="col-sm-8">
                     <asp:TextBox ID="txtCidade" runat="server" CssClass="form-control" />
-                </div>
-                </div>
-
-                <div class="mb-2 row">
-                <label class="col-sm-4 col-form-label" for="txtCEP">CEP:</label>
-                <div class="col-sm-8">
-                    <asp:TextBox ID="txtCEP" runat="server" CssClass="form-control" />
-                </div>
+                  </div>
                 </div>
 
                 <div class="mb-2 row">
-                <label class="col-sm-4 col-form-label" for="txtEndereco">Endereço:</label>
-                <div class="col-sm-8">
+                  <label class="col-sm-4 col-form-label" for="txtCEP">CEP:</label>
+                  <div class="col-sm-8">
+                    <div class="input-group">
+                      <asp:TextBox ID="txtCEP" runat="server" CssClass="form-control" />
+                      <asp:Button 
+                        ID="btnValidateCep" 
+                        runat="server" 
+                        Text="OK" 
+                        CssClass="btn btn-outline-secondary" 
+                        OnClientClick="return false;" />
+                    </div>
+                    <asp:RequiredFieldValidator
+                      ID="reqCEP"
+                      runat="server"
+                      ControlToValidate="txtCEP"
+                      ErrorMessage="* Obrigatório"
+                      Display="Dynamic"
+                      CssClass="text-danger" />
+                  </div>
+                </div>
+
+                <div class="mb-2 row">
+                  <label class="col-sm-4 col-form-label" for="txtEndereco">Endereço:</label>
+                  <div class="col-sm-8">
                     <asp:TextBox ID="txtEndereco" runat="server" CssClass="form-control" />
-                </div>
+                  </div>
                 </div>
 
                 <div class="mb-2 row">
-                <label class="col-sm-4 col-form-label" for="txtPais">País:</label>
-                <div class="col-sm-8">
+                  <label class="col-sm-4 col-form-label" for="txtPais">País:</label>
+                  <div class="col-sm-8">
                     <asp:TextBox ID="txtPais" runat="server" CssClass="form-control" />
-                </div>
+                  </div>
                 </div>
 
                 <div class="mb-2 row">
-                <label class="col-sm-4 col-form-label" for="txtTelefone">Telefone:</label>
-                <div class="col-sm-8">
-                    <%--<asp:TextBox ID="txtTelefone" runat="server" CssClass="form-control"  />--%>
+                  <label class="col-sm-4 col-form-label" for="txtTelefone">Telefone:</label>
+                  <div class="col-sm-8">
+                    <asp:TextBox ID="txtTelefone" runat="server" CssClass="form-control" />
+                  </div>
                 </div>
-                </div>
+              </div>
             </div>
+
+            <!-- Combobox de Cargo -->
+            <div class="row gx-3 gy-2 mt-3">
+              <div class="col-md-6">
+                <h6>Selecione o Cargo</h6>
+                <div class="mb-2 row">
+                  <label class="col-sm-4 col-form-label" for="ddlCargo">Cargo:</label>
+                  <div class="col-sm-8">
+                    <asp:DropDownList ID="ddlCargo" runat="server" CssClass="form-select" />
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6"></div>
+            </div>
+          </div>
 
           <!-- Aba Financeiro -->
           <div class="tab-pane fade" id="paneFinanceiro">
@@ -130,9 +167,12 @@
           </div>
         </div>
       </div>
+
+      <!-- Rodapé -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
       </div>
+
     </div>
   </div>
 </div>
