@@ -2,6 +2,7 @@
 using System.Data;
 using System.Configuration;
 using Oracle.ManagedDataAccess.Client;
+using ESIGWeb.Models;
 
 namespace ESIGWeb.Data
 {
@@ -63,6 +64,45 @@ namespace ESIGWeb.Data
             }
 
             return dt;
+        }
+
+        public static Pessoa ObterPessoa(int Id)
+        {
+            const string sql = @"
+                SELECT p.id AS Id,
+                       p.nome AS Nome,
+                       c.id AS CargoId,
+                       c.nome AS CargoNome
+                  FROM pessoa p
+                  JOIN cargo c
+                    ON c.id = p.cargo_id
+                 WHERE p.id = :pId";
+
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.Add("pId", OracleDbType.Int32).Value = Id;
+                conn.Open();
+
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    if (rdr.Read())
+                    {
+                        return new Pessoa
+                        {
+                            Id = rdr.GetInt32(0),
+                            Nome = rdr.GetString(1),
+                            CargoId = rdr.GetInt32(2),
+                            CargoNome = rdr.GetString(3)
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
         }
     }
 }

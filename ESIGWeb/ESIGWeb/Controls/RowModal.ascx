@@ -50,10 +50,19 @@
 </div>
 
 <script>
-    // Script para abrir a modal
     document.addEventListener('showRowModal', function () {
         var modalEl = document.getElementById('rowModal');
-        var modal = new bootstrap.Modal(modalEl);
-        modal.show();
+        var pessoaId = modalEl.getAttribute('data-pessoa-id');
+
+        // agora você tem o pessoaId e pode:
+        // 1) preencher um span já existente
+        document.getElementById('lblPessoaId').innerText = pessoaId;
+
+        // 2) ou armazenar numa variável JS para usar depois
+        window.currentPessoaId = pessoaId;
+
+        // enfim, exibe a modal
+        new bootstrap.Modal(modalEl).show();
     });
 </script>
+

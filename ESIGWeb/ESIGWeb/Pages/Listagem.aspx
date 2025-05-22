@@ -6,31 +6,17 @@
 <head runat="server">
     <title>Listagem de Pessoas e Salários</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <style>
-      /* Hover nas linhas de dados: pinta TODAS as células da linha */
       .table tbody tr:hover td {
         background-color: #f0f8ff !important;
         cursor: pointer;
       }
     </style>
-
-    <%--<style>
-        /* Hover ao passar o mouse */
-        .data-row:hover {
-            background-color: #f0f8ff !important;
-            cursor: pointer;
-        }
-        .data-row {
-            transition: background-color 0.2s ease;
-        }
-        /* Linha selecionada */
-        .data-row.selected {
-            background-color: #ffe4b5 !important;
-        }
-    </style>--%>
 </head>
 <body>
     <form id="form1" runat="server" class="container mt-4">
+        <asp:ScriptManager runat="server" EnablePageMethods="true" />
         <h2>Listagem de Pessoas e Salários</h2>
 
         <asp:GridView
@@ -67,7 +53,7 @@
 
     <!-- Scripts Bootstrap e lógica de click -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+<%--    <script>
         document.addEventListener('DOMContentLoaded', function () {
             var grid = document.getElementById('<%= gridPessoas.ClientID %>');
             if (!grid) return;
@@ -90,6 +76,44 @@
                 document.dispatchEvent(evt);
             });
         });
+    </script>--%>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var grid = document.getElementById('<%= gridPessoas.ClientID %>');
+        var tbody = grid && grid.querySelector('tbody');
+        var modal = document.getElementById('rowModal');
+        if (!tbody) return;
+
+        tbody.addEventListener('click', function (e) {
+            // encontra a linha clicada
+            var tr = e.target;
+            while (tr && tr.nodeName !== 'TR') tr = tr.parentNode;
+            if (!tr) return;
+
+            // tenta ler o atributo data-pessoa-id
+            var pessoaId = tr.getAttribute('data-pessoa-id');
+            if (!pessoaId) return;    // aborta se for header/pager
+
+            // adiciona seleção visual
+            Array.from(tbody.rows).forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+
+            // guarda no modal
+            modal.setAttribute('data-pessoa-id', pessoaId);
+            // opcional: também preenche o label de ID imediatamente
+            document.getElementById('lblPessoaId').innerText = pessoaId;
+
+            // finalmente abre a modal
+            new bootstrap.Modal(modal).show();
+        });
+    });
     </script>
+
+
+
+
+
+
 </body>
 </html>
