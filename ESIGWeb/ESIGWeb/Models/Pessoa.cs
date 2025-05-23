@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 namespace ESIGWeb.Models
 {
@@ -17,5 +18,14 @@ namespace ESIGWeb.Models
         public DateTime DataNascimento { get; set; }
         public int CargoId { get; set; }
         public string CargoNome { get; set; }
+        public List<VencimentoItem> Creditos { get; set; }
+        public List<VencimentoItem> Debitos { get; set; }
+    }
+
+    public class VencimentoItem
+    {
+        public string Descricao { get; set; }
+        public decimal Valor { get; set; }
+        public string FormaIncidencia { get; set; }
     }
 }

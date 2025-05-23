@@ -161,12 +161,57 @@
             </div>
           </div>
 
-          <!-- Aba Financeiro -->
-          <div class="tab-pane fade" id="paneFinanceiro">
-            <p class="text-muted">Detalhes financeiros estarão disponíveis em breve.</p>
-          </div>
+        <!-- Aba Financeiro -->
+        <div class="tab-pane fade" id="paneFinanceiro" role="tabpanel" aria-labelledby="tab-financeiro">
+            <h6 class="mt-3">Créditos</h6>
+            <asp:GridView
+                ID="gridCreditos"
+                runat="server"
+                AutoGenerateColumns="false"
+                ShowHeaderWhenEmpty="true"
+                EmptyDataText="Nenhum crédito encontrado."
+                CssClass="table table-sm table-striped table-bordered mb-4"
+                GridLines="None">
+            <Columns>
+                <asp:BoundField DataField="Descricao" HeaderText="Descrição" />
+
+                <asp:TemplateField HeaderText="Valor">
+                <ItemTemplate>
+                    <%# Eval("FormaIncidencia").ToString() == "P"
+                        ? Eval("Valor", "{0:0.##}") + "%"
+                        : Eval("Valor", "{0:C}") %>
+                </ItemTemplate>
+                </asp:TemplateField>
+
+                <asp:BoundField DataField="FormaIncidencia" HeaderText="Incidência" />
+            </Columns>
+            </asp:GridView>
+
+            <h6 class="mt-4">Débitos</h6>
+            <asp:GridView
+                ID="gridDebitos"
+                runat="server"
+                AutoGenerateColumns="false"
+                ShowHeaderWhenEmpty="true"
+                EmptyDataText="Nenhum débito encontrado."
+                CssClass="table table-sm table-striped table-bordered"
+                GridLines="None">
+            <Columns>
+                <asp:BoundField DataField="Descricao" HeaderText="Descrição" />
+
+                <asp:TemplateField HeaderText="Valor">
+                <ItemTemplate>
+                    <%# Eval("FormaIncidencia").ToString() == "P"
+                        ? Eval("Valor", "{0:0.##}") + "%"
+                        : Eval("Valor", "{0:C}") %>
+                </ItemTemplate>
+                </asp:TemplateField>
+
+                <asp:BoundField DataField="FormaIncidencia" HeaderText="Incidência" />
+            </Columns>
+            </asp:GridView>
         </div>
-      </div>
+
 
       <!-- Rodapé -->
       <div class="modal-footer">

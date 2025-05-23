@@ -61,6 +61,12 @@ namespace ESIGWeb.Controls
             // Seleciona o cargo atual da pessoa
             if (ddlCargo.Items.FindByValue(p.CargoId.ToString()) != null)
                 ddlCargo.SelectedValue = p.CargoId.ToString();
+            //dados financeiro
+            gridCreditos.DataSource = p.Creditos;
+            gridCreditos.DataBind();
+
+            gridDebitos.DataSource = p.Debitos;
+            gridDebitos.DataBind();
 
             // 7) Enfileira o script para abrir a modal já populada
             Page.ClientScript.RegisterStartupScript(
