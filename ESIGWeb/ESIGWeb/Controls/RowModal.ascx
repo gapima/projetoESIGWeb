@@ -240,7 +240,20 @@
 
       <!-- Rodapé -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        <asp:Button
+          ID="btnSavePessoa"
+          runat="server"
+          Text="Salvar"
+          CssClass="btn btn-primary"
+          OnClick="btnSavePessoa_Click" />
+        
+        <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">
+          Excluir
+        </button>
+        
+        <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">
+          Cancelar
+        </button>
       </div>
 
     </div>

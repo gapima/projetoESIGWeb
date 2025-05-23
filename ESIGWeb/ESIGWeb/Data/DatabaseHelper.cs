@@ -192,5 +192,84 @@ namespace ESIGWeb.Data
         }
 
 
+        //update
+        public static void SalvarPessoa(Pessoa p)
+        {
+            const string sqlUpdate = @"
+                UPDATE pessoa
+                   SET nome            = :nome,
+                       data_nascimento = :dataNascimento,
+                       email           = :email,
+                       usuario         = :usuario,
+                       cidade          = :cidade,
+                       cep             = :cep,
+                       endereco        = :endereco,
+                       pais            = :pais,
+                       telefone        = :telefone,
+                       cargo_id        = :cargoId
+                 WHERE id = :id";
+
+            // Se quiser INSERT quando p.Id == 0, descomente este bloco:
+            /*
+            const string sqlInsert = @"
+                INSERT INTO pessoa (
+                    nome, data_nascimento, email, usuario,
+                    cidade, cep, endereco, pais, telefone,
+                    cargo_id
+                )
+                VALUES (
+                    :nome, :dataNascimento, :email, :usuario,
+                    :cidade, :cep, :endereco, :pais, :telefone,
+                    :cargoId
+                )
+                RETURNING id INTO :newId";
+            */
+
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sqlUpdate, conn))
+            {
+                cmd.CommandType = CommandType.Text;
+
+                // Parâmetros obrigatórios para o UPDATE
+                cmd.Parameters.Add("nome", OracleDbType.Varchar2).Value = p.Nome;
+                cmd.Parameters.Add("dataNascimento", OracleDbType.Date).Value = p.DataNascimento;
+                cmd.Parameters.Add("email", OracleDbType.Varchar2).Value = p.Email;
+                cmd.Parameters.Add("usuario", OracleDbType.Varchar2).Value = p.Usuario;
+                cmd.Parameters.Add("cidade", OracleDbType.Varchar2).Value = p.Cidade;
+                cmd.Parameters.Add("cep", OracleDbType.Varchar2).Value = p.CEP;
+                cmd.Parameters.Add("endereco", OracleDbType.Varchar2).Value = p.Endereco;
+                cmd.Parameters.Add("pais", OracleDbType.Varchar2).Value = p.Pais;
+                cmd.Parameters.Add("telefone", OracleDbType.Varchar2).Value = p.Telefone;
+                cmd.Parameters.Add("cargoId", OracleDbType.Int32).Value = p.CargoId;
+                cmd.Parameters.Add("id", OracleDbType.Int32).Value = p.Id;
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            /* 
+            // Exemplo de INSERT se precisar criar novos registros:
+            if (p.Id == 0)
+            {
+                using (var conn = new OracleConnection(ConnectionString))
+                using (var cmd  = new OracleCommand(sqlInsert, conn))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    // adicionar mesmos parâmetros de p.Nome… p.CargoId
+                    var outParam = new OracleParameter("newId", OracleDbType.Int32)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(outParam);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    p.Id = Convert.ToInt32(outParam.Value);
+                }
+            }
+            */
+        }
+
+
+
     }
 }

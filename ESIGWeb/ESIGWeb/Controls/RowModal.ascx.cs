@@ -101,5 +101,47 @@ namespace ESIGWeb.Controls
                 true
             );
         }
+
+        protected void btnSavePessoa_Click(object sender, EventArgs e)
+        {
+            // 1) Reconstrói e salva o objeto Pessoa
+            var p = new Pessoa
+            {
+                Id = int.Parse(txtPessoaId.Text),
+                Nome = txtPessoaNome.Text,
+                DataNascimento = DateTime.Parse(txtDataNascimento.Text),
+                Email = txtEmail.Text,
+                Usuario = txtUsuario.Text,
+                Cidade = txtCidade.Text,
+                CEP = txtCEP.Text,
+                Endereco = txtEndereco.Text,
+                Pais = txtPais.Text,
+                Telefone = txtTelefone.Text,
+                CargoId = int.Parse(ddlCargo.SelectedValue)
+            };
+            DatabaseHelper.SalvarPessoa(p);
+
+            // 2) Fecha a modal e aciona o btnCalcular na página pai
+            //    Usamos __doPostBack com o UniqueID do btnCalcular
+            var btnCalc = Page.FindControl("btnCalcular") as System.Web.UI.WebControls.Button;
+            string postbackRef = btnCalc != null
+                ? Page.ClientScript.GetPostBackEventReference(btnCalc, "")
+                : "__doPostBack('','')";
+
+            string script = $@"
+              var m = bootstrap.Modal.getInstance(document.getElementById('rowModal'));
+              if(m) m.hide();
+              {postbackRef};
+            ";
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "savePessoa",
+                script,
+                true
+            );
+        }
+
     }
 }
