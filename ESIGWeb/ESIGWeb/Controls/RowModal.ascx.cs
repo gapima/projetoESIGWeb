@@ -4,6 +4,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using ESIGWeb.Data;
 using ESIGWeb.Models;
+using Microsoft.Ajax.Utilities;
 
 namespace ESIGWeb.Controls
 {
@@ -104,10 +105,10 @@ namespace ESIGWeb.Controls
 
         protected void btnSavePessoa_Click(object sender, EventArgs e)
         {
-            // 1) Reconstrói e salva o objeto Pessoa
+            // 1) Reconstrói o objeto Pessoa a partir dos campos
             var p = new Pessoa
             {
-                Id = int.Parse(txtPessoaId.Text),
+                Id = !txtPessoaId.Text.IsNullOrWhiteSpace() ? int.Parse(txtPessoaId.Text) : 0,
                 Nome = txtPessoaNome.Text,
                 DataNascimento = DateTime.Parse(txtDataNascimento.Text),
                 Email = txtEmail.Text,
@@ -119,10 +120,45 @@ namespace ESIGWeb.Controls
                 Telefone = txtTelefone.Text,
                 CargoId = int.Parse(ddlCargo.SelectedValue)
             };
-            DatabaseHelper.SalvarPessoa(p);
 
-            // 2) Fecha a modal e aciona o btnCalcular na página pai
-            //    Usamos __doPostBack com o UniqueID do btnCalcular
+            // 2) Decide INSERT ou UPDATE
+            if (p.Id == 0)
+            {
+                // novo registro
+                p.Id = DatabaseHelper.InserirPessoa(p);
+            }
+            else
+            {
+                // edição
+                DatabaseHelper.SalvarPessoa(p);
+            }
+
+            // 3) Fecha a modal e recarrega a página via GET para disparar CarregarDados()
+            string script = @"
+              var m = bootstrap.Modal.getInstance(document.getElementById('rowModal'));
+              if (m) m.hide();
+              window.location.href = window.location.pathname + window.location.search;
+            ";
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "savePessoa",
+                script,
+                true
+            );
+        }
+
+
+        protected void btnDeletePessoa_Click(object sender, EventArgs e)
+        {
+            if (!int.TryParse(txtPessoaId.Text, out var pessoaId))
+                return;
+
+            // 1) Exclui do banco
+            DatabaseHelper.ExcluirPessoa(pessoaId);
+
+            // 2) Fecha a modal e dispara btnCalcular na página pai
             var btnCalc = Page.FindControl("btnCalcular") as System.Web.UI.WebControls.Button;
             string postbackRef = btnCalc != null
                 ? Page.ClientScript.GetPostBackEventReference(btnCalc, "")
@@ -137,11 +173,12 @@ namespace ESIGWeb.Controls
             ScriptManager.RegisterStartupScript(
                 this,
                 GetType(),
-                "savePessoa",
+                "deletePessoa",
                 script,
                 true
             );
         }
+
 
     }
 }

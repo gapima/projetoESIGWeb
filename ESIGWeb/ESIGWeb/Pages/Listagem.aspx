@@ -57,8 +57,14 @@
       Text="Recalcular Salários"
       CssClass="btn btn-primary mt-3"
       OnClick="btnCalcular_Click" />
+    <asp:Button
+        ID="btnAddPessoa"
+        runat="server"
+        Text="Nova Pessoa"
+        CssClass="btn btn-success ms-2"
+        OnClick="btnAddPessoa_Click" />
 
-    <!-- Injeção do UserControl de modal -->
+
     <uc:RowModal ID="RowModal1" runat="server" />
   </form>
 </body>
@@ -72,9 +78,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         // Captura o botão OK e os inputs do RowModal
         var btnOk = document.getElementById('<%= RowModal1.FindControl("btnValidateCep").ClientID %>');
-      var txtCep = document.getElementById('<%= RowModal1.FindControl("txtCEP").ClientID %>');
-    var txtEndereco = document.getElementById('<%= RowModal1.FindControl("txtEndereco").ClientID %>');
-    var txtCidade = document.getElementById('<%= RowModal1.FindControl("txtCidade").ClientID %>');
+        var txtCep = document.getElementById('<%= RowModal1.FindControl("txtCEP").ClientID %>');
+        var txtEndereco = document.getElementById('<%= RowModal1.FindControl("txtEndereco").ClientID %>');
+        var txtCidade = document.getElementById('<%= RowModal1.FindControl("txtCidade").ClientID %>');
 
       // Handler de clique
       btnOk.addEventListener('click', function (e) {
@@ -106,4 +112,35 @@
               });
       });
   });
+</script>
+
+<script type="text/javascript">
+    function openNewPessoaModal() {
+        // Obtém referência à modal
+        var modalEl = document.getElementById('rowModal');
+        var modal = new bootstrap.Modal(modalEl);
+
+        // Limpa todos os campos da aba Pessoa
+      document.getElementById('<%= RowModal1.FindControl("txtPessoaId").ClientID %>').value = '0';
+      document.getElementById('<%= RowModal1.FindControl("txtPessoaNome").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtDataNascimento").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtEmail").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtUsuario").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtCidade").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtCEP").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtEndereco").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtPais").ClientID %>').value = '';
+      document.getElementById('<%= RowModal1.FindControl("txtTelefone").ClientID %>').value = '';
+
+    // Zera o dropdown de cargos (seleciona o primeiro item “-- selecione --”)
+    var ddl = document.getElementById('<%= RowModal1.FindControl("ddlCargo").ClientID %>');
+    if (ddl) ddl.selectedIndex = 0;
+
+    // Esconde mensagens de validação
+    var valSum = document.querySelector('#<%= RowModal1.ClientID %> .alert');
+        if (valSum) valSum.style.display = 'none';
+
+        // Abre a modal
+        modal.show();
+    }
 </script>

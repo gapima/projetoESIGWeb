@@ -104,9 +104,9 @@ namespace ESIGWeb.Data
                     {
                         Id = rdr.GetInt32(rdr.GetOrdinal("Id")),
                         Nome = rdr.GetString(rdr.GetOrdinal("Nome")),
+                        CEP = rdr.GetString(rdr.GetOrdinal("CEP")),
                         Cidade = rdr.GetString(rdr.GetOrdinal("Cidade")),
                         Email = rdr.GetString(rdr.GetOrdinal("Email")),
-                        CEP = rdr.GetString(rdr.GetOrdinal("CEP")),
                         Endereco = rdr.GetString(rdr.GetOrdinal("Endereco")),
                         Pais = rdr.GetString(rdr.GetOrdinal("Pais")),
                         Usuario = rdr.GetString(rdr.GetOrdinal("Usuario")),
@@ -267,6 +267,56 @@ namespace ESIGWeb.Data
                 }
             }
             */
+        }
+
+        //insert
+        public static int InserirPessoa(Pessoa p)
+        {
+            const string sql = @"
+              INSERT INTO pessoa (
+                  nome, data_nascimento, email, usuario,
+                  cidade, cep, endereco, pais, telefone,
+                  cargo_id
+              ) VALUES (
+                  :nome, :dataNascimento, :email, :usuario,
+                  :cidade, :cep, :endereco, :pais, :telefone,
+                  :cargoId
+              )";
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+                cmd.Parameters.Add("nome", OracleDbType.Varchar2).Value = p.Nome;
+                cmd.Parameters.Add("dataNascimento", OracleDbType.Date).Value = p.DataNascimento;
+                cmd.Parameters.Add("email", OracleDbType.Varchar2).Value = p.Email;
+                cmd.Parameters.Add("usuario", OracleDbType.Varchar2).Value = p.Usuario;
+                cmd.Parameters.Add("cidade", OracleDbType.Varchar2).Value = p.Cidade;
+                cmd.Parameters.Add("cep", OracleDbType.Varchar2).Value = p.CEP;
+                cmd.Parameters.Add("endereco", OracleDbType.Varchar2).Value = p.Endereco;
+                cmd.Parameters.Add("pais", OracleDbType.Varchar2).Value = p.Pais;
+                cmd.Parameters.Add("telefone", OracleDbType.Varchar2).Value = p.Telefone;
+                cmd.Parameters.Add("cargoId", OracleDbType.Int32).Value = p.CargoId;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            return 0;
+        }
+
+
+
+        //delete
+        public static void ExcluirPessoa(int id)
+        {
+            const string sql = "DELETE FROM pessoa WHERE id = :pId";
+
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.Add("pId", OracleDbType.Int32).Value = id;
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
 
 

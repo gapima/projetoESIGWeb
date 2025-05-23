@@ -95,13 +95,6 @@
                 <h6>Endereço & Contato</h6>
 
                 <div class="mb-2 row">
-                  <label class="col-sm-4 col-form-label" for="txtCidade">Cidade:</label>
-                  <div class="col-sm-8">
-                    <asp:TextBox ID="txtCidade" runat="server" CssClass="form-control" />
-                  </div>
-                </div>
-
-                <div class="mb-2 row">
                   <label class="col-sm-4 col-form-label" for="txtCEP">CEP:</label>
                   <div class="col-sm-8">
                     <div class="input-group">
@@ -120,6 +113,13 @@
                       ErrorMessage="* Obrigatório"
                       Display="Dynamic"
                       CssClass="text-danger" />
+                  </div>
+                </div>
+
+                <div class="mb-2 row">
+                  <label class="col-sm-4 col-form-label" for="txtCidade">Cidade:</label>
+                  <div class="col-sm-8">
+                    <asp:TextBox ID="txtCidade" runat="server" CssClass="form-control" />
                   </div>
                 </div>
 
@@ -246,10 +246,14 @@
           Text="Salvar"
           CssClass="btn btn-primary"
           OnClick="btnSavePessoa_Click" />
-        
-        <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">
-          Excluir
-        </button>
+
+        <asp:Button
+          ID="btnDeletePessoa"
+          runat="server"
+          Text="Excluir"
+          CssClass="btn btn-danger ms-2"
+          OnClick="btnDeletePessoa_Click"
+          OnClientClick="return confirm('Deseja realmente excluir esta pessoa?');" />
         
         <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">
           Cancelar

@@ -44,5 +44,50 @@ namespace ESIGWeb
             DatabaseHelper.ExecutarProcedureCalculo();
             CarregarDados();
         }
+
+        protected void btnAddPessoa_Click(object sender, EventArgs e)
+        {
+            // 1) Popula o dropdown de cargos dentro do RowModal
+            var ddlCargo = RowModal1.FindControl("ddlCargo") as DropDownList;
+            if (ddlCargo != null)
+            {
+                var dt = DatabaseHelper.ObterTodosCargos();
+                ddlCargo.DataSource = dt;
+                ddlCargo.DataValueField = "id";
+                ddlCargo.DataTextField = "nome";
+                ddlCargo.DataBind();
+            }
+
+            // 2) Limpa todos os campos da modal
+            var clearFields = @"
+              // zera todos os inputs
+              document.getElementById('" + RowModal1.FindControl("txtPessoaId").ClientID + @"').value = '0';
+              document.getElementById('" + RowModal1.FindControl("txtPessoaNome").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtDataNascimento").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtEmail").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtUsuario").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtCidade").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtCEP").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtEndereco").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtPais").ClientID + @"').value = '';
+              document.getElementById('" + RowModal1.FindControl("txtTelefone").ClientID + @"').value = '';
+              // seleciona primeiro item do ddl
+              var ddl = document.getElementById('" + ddlCargo.ClientID + @"');
+              if (ddl) ddl.selectedIndex = 0;
+            ";
+
+            // 3) Registra script para limpar e abrir a modal
+            string script = clearFields
+                          + "new bootstrap.Modal(document.getElementById('rowModal')).show();";
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "openNewPessoa",
+                script,
+                true
+            );
+        }
+
     }
 }
