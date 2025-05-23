@@ -162,54 +162,74 @@
           </div>
 
         <!-- Aba Financeiro -->
-        <div class="tab-pane fade" id="paneFinanceiro" role="tabpanel" aria-labelledby="tab-financeiro">
-            <h6 class="mt-3">Créditos</h6>
-            <asp:GridView
-                ID="gridCreditos"
-                runat="server"
-                AutoGenerateColumns="false"
-                ShowHeaderWhenEmpty="true"
-                EmptyDataText="Nenhum crédito encontrado."
-                CssClass="table table-sm table-striped table-bordered mb-4"
-                GridLines="None">
-            <Columns>
-                <asp:BoundField DataField="Descricao" HeaderText="Descrição" />
-
-                <asp:TemplateField HeaderText="Valor">
-                <ItemTemplate>
-                    <%# Eval("FormaIncidencia").ToString() == "P"
-                        ? Eval("Valor", "{0:0.##}") + "%"
-                        : Eval("Valor", "{0:C}") %>
-                </ItemTemplate>
-                </asp:TemplateField>
-
-                <asp:BoundField DataField="FormaIncidencia" HeaderText="Incidência" />
-            </Columns>
-            </asp:GridView>
-
-            <h6 class="mt-4">Débitos</h6>
-            <asp:GridView
-                ID="gridDebitos"
-                runat="server"
-                AutoGenerateColumns="false"
-                ShowHeaderWhenEmpty="true"
-                EmptyDataText="Nenhum débito encontrado."
-                CssClass="table table-sm table-striped table-bordered"
-                GridLines="None">
-            <Columns>
-                <asp:BoundField DataField="Descricao" HeaderText="Descrição" />
-
-                <asp:TemplateField HeaderText="Valor">
-                <ItemTemplate>
-                    <%# Eval("FormaIncidencia").ToString() == "P"
-                        ? Eval("Valor", "{0:0.##}") + "%"
-                        : Eval("Valor", "{0:C}") %>
-                </ItemTemplate>
-                </asp:TemplateField>
-
-                <asp:BoundField DataField="FormaIncidencia" HeaderText="Incidência" />
-            </Columns>
-            </asp:GridView>
+         <div class="tab-pane fade" id="paneFinanceiro" role="tabpanel" aria-labelledby="tab-financeiro">
+          <div class="row">
+            <!-- Cartão Créditos -->
+            <div class="col-md-6 mb-4">
+              <div class="card shadow-sm h-100">
+                <div class="card-header bg-white py-2">
+                  <strong>Créditos</strong>
+                </div>
+                <div class="card-body p-0">
+                  <asp:GridView
+                    ID="gridCreditos"
+                    runat="server"
+                    AutoGenerateColumns="false"
+                    CssClass="table table-sm table-borderless table-hover mb-0">
+                    <Columns>
+                      <asp:BoundField DataField="Descricao" HeaderText="Descrição" 
+                                      ItemStyle-CssClass="px-3 py-2" />
+              
+                      <asp:TemplateField HeaderText="Valor">
+                        <ItemStyle CssClass="px-3 py-2 text-end" />
+                        <ItemTemplate>
+                          <%# Eval("FormaIncidencia").ToString() == "P"
+                                ? Eval("Valor", "{0:0.##}") + "%"
+                                : Eval("Valor", "{0:C}") %>
+                        </ItemTemplate>
+                      </asp:TemplateField>
+              
+                      <asp:BoundField DataField="FormaIncidencia" HeaderText="Incid." 
+                                      ItemStyle-CssClass="px-3 py-2 text-center" />
+                    </Columns>
+                  </asp:GridView>
+                </div>
+              </div>
+            </div>
+    
+            <!-- Cartão Débitos -->
+            <div class="col-md-6 mb-4">
+              <div class="card shadow-sm h-100">
+                <div class="card-header bg-white py-2">
+                  <strong>Débitos</strong>
+                </div>
+                <div class="card-body p-0">
+                  <asp:GridView
+                    ID="gridDebitos"
+                    runat="server"
+                    AutoGenerateColumns="false"
+                    CssClass="table table-sm table-borderless table-hover mb-0">
+                    <Columns>
+                      <asp:BoundField DataField="Descricao" HeaderText="Descrição" 
+                                      ItemStyle-CssClass="px-3 py-2" />
+              
+                      <asp:TemplateField HeaderText="Valor">
+                        <ItemStyle CssClass="px-3 py-2 text-end" />
+                        <ItemTemplate>
+                          <%# Eval("FormaIncidencia").ToString() == "P"
+                                ? Eval("Valor", "{0:0.##}") + "%"
+                                : Eval("Valor", "{0:C}") %>
+                        </ItemTemplate>
+                      </asp:TemplateField>
+              
+                      <asp:BoundField DataField="FormaIncidencia" HeaderText="Incid." 
+                                      ItemStyle-CssClass="px-3 py-2 text-center" />
+                    </Columns>
+                  </asp:GridView>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
 
