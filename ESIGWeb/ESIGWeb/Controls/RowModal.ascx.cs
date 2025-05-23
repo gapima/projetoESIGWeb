@@ -76,5 +76,30 @@ namespace ESIGWeb.Controls
                 true
             );
         }
+
+        protected void ddlCargo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // obtém o cargo selecionado
+            if (int.TryParse(ddlCargo.SelectedValue, out var novoCargoId))
+            {
+                // rebinding da parte financeira
+                var creditos = DatabaseHelper.ObterDadosFinanceiroPessoa(novoCargoId, "C");
+                gridCreditos.DataSource = creditos;
+                gridCreditos.DataBind();
+
+                var debitos = DatabaseHelper.ObterDadosFinanceiroPessoa(novoCargoId, "D");
+                gridDebitos.DataSource = debitos;
+                gridDebitos.DataBind();
+            }
+
+            // garante que a modal permaneça aberta após o async postback
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "showRowModal",
+                "new bootstrap.Modal(document.getElementById('rowModal')).show();",
+                true
+            );
+        }
     }
 }

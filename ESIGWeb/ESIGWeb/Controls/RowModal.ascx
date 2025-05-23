@@ -153,7 +153,12 @@
                 <div class="mb-2 row">
                   <label class="col-sm-4 col-form-label" for="ddlCargo">Cargo:</label>
                   <div class="col-sm-8">
-                    <asp:DropDownList ID="ddlCargo" runat="server" CssClass="form-select" />
+                    <asp:DropDownList 
+                        ID="ddlCargo" 
+                        runat="server" 
+                        CssClass="form-select"
+                        AutoPostBack="true"
+                        OnSelectedIndexChanged="ddlCargo_SelectedIndexChanged" />
                   </div>
                 </div>
               </div>
