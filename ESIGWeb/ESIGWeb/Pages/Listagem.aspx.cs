@@ -1,8 +1,9 @@
-﻿using System;
+﻿using ESIGWeb.Controls;
+using ESIGWeb.Data;
+using System;
 using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using ESIGWeb.Data;
 
 namespace ESIGWeb
 {
@@ -45,6 +46,11 @@ namespace ESIGWeb
             CarregarDados();
         }
 
+        void LimparCampo(Control parent, string id)
+        {
+            var txt = parent.FindControl(id) as TextBox;
+            if (txt != null) txt.Text = "";
+        }
         protected void btnAddPessoa_Click(object sender, EventArgs e)
         {
             // 1) Popula o dropdown de cargos dentro do RowModal
@@ -57,28 +63,51 @@ namespace ESIGWeb
                 ddlCargo.DataTextField = "nome";
                 ddlCargo.DataBind();
             }
+            var gridCreditos = RowModal1.FindControl("gridCreditos") as GridView;
+            var creditos = DatabaseHelper.ObterDadosFinanceiroPessoa(1, "C");
+            gridCreditos.DataSource = creditos;
+            gridCreditos.DataBind();
 
-            // 2) Limpa todos os campos da modal
-            var clearFields = @"
-              // zera todos os inputs
-              document.getElementById('" + RowModal1.FindControl("txtPessoaId").ClientID + @"').value = '0';
-              document.getElementById('" + RowModal1.FindControl("txtPessoaNome").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtDataNascimento").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtEmail").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtUsuario").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtCidade").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtCEP").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtEndereco").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtPais").ClientID + @"').value = '';
-              document.getElementById('" + RowModal1.FindControl("txtTelefone").ClientID + @"').value = '';
-              // seleciona primeiro item do ddl
-              var ddl = document.getElementById('" + ddlCargo.ClientID + @"');
-              if (ddl) ddl.selectedIndex = 0;
-            ";
+            var gridDebitos = RowModal1.FindControl("gridDebitos") as GridView;
+            var debitos = DatabaseHelper.ObterDadosFinanceiroPessoa(1, "D");
+            gridDebitos.DataSource = debitos;
+            gridDebitos.DataBind();
+
+            var txtPessoaId = RowModal1.FindControl("txtPessoaId") as TextBox;
+            if (txtPessoaId != null) txtPessoaId.Text = "0";
+
+            var txtPessoaNome = RowModal1.FindControl("txtPessoaNome") as TextBox;
+            if (txtPessoaNome != null) txtPessoaNome.Text = "";
+
+            var txtDataNascimento = RowModal1.FindControl("txtDataNascimento") as TextBox;
+            if (txtDataNascimento != null) txtDataNascimento.Text = "";
+
+            var txtEmail = RowModal1.FindControl("txtEmail") as TextBox;
+            if (txtEmail != null) txtEmail.Text = "";
+
+            var txtUsuario = RowModal1.FindControl("txtUsuario") as TextBox;
+            if (txtUsuario != null) txtUsuario.Text = "";
+
+            var txtCidade = RowModal1.FindControl("txtCidade") as TextBox;
+            if (txtCidade != null) txtCidade.Text = "";
+
+            var txtCEP = RowModal1.FindControl("txtCEP") as TextBox;
+            if (txtCEP != null) txtCEP.Text = "";
+
+            var txtEndereco = RowModal1.FindControl("txtEndereco") as TextBox;
+            if (txtEndereco != null) txtEndereco.Text = "";
+
+            var txtPais = RowModal1.FindControl("txtPais") as TextBox;
+            if (txtPais != null) txtPais.Text = "";
+
+            var txtTelefone = RowModal1.FindControl("txtTelefone") as TextBox;
+            if (txtTelefone != null) txtTelefone.Text = "";
+
+            LimparCampo(RowModal1, "txtPessoaId");
+            LimparCampo(RowModal1, "txtPessoaNome");
 
             // 3) Registra script para limpar e abrir a modal
-            string script = clearFields
-                          + "new bootstrap.Modal(document.getElementById('rowModal')).show();";
+            string script = "new bootstrap.Modal(document.getElementById('rowModal')).show();";
 
             ScriptManager.RegisterStartupScript(
                 this,

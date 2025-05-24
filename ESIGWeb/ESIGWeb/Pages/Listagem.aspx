@@ -61,7 +61,8 @@
         ID="btnAddPessoa"
         runat="server"
         Text="Nova Pessoa"
-        CssClass="btn btn-success ms-2"
+        CssClass="btn btn-primary mt-3"
+        style="float: right"
         OnClick="btnAddPessoa_Click" />
 
 

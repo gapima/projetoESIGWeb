@@ -133,20 +133,7 @@ namespace ESIGWeb.Controls
                 DatabaseHelper.SalvarPessoa(p);
             }
 
-            // 3) Fecha a modal e recarrega a página via GET para disparar CarregarDados()
-            string script = @"
-              var m = bootstrap.Modal.getInstance(document.getElementById('rowModal'));
-              if (m) m.hide();
-              window.location.href = window.location.pathname + window.location.search;
-            ";
-
-            ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                "savePessoa",
-                script,
-                true
-            );
+           
         }
 
 
