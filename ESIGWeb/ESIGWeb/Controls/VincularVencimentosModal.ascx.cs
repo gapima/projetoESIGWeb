@@ -91,6 +91,15 @@ namespace ESIGWeb.Controls
                         selecionados.Add(i);
             }
 
+            var v = new Vencimentos
+            {
+                Id = vid,
+                Valor = decimal.Parse(txtValor.Text),
+                FormaIncidencia = ddlForma.SelectedValue,
+                Tipo = ddlTipo.SelectedValue
+            };
+            DatabaseHelper.AtualizarVencimento(v);
+
             // pega todos os cargos de novo
             var todosDt = DatabaseHelper.ObterTodosCargos();
             var todosIds = todosDt.Rows
@@ -105,6 +114,7 @@ namespace ESIGWeb.Controls
                 else
                     DatabaseHelper.DesvincularCargo(vid, cid);
             }
+            CarregarDropdowns();
 
             // fecha modal
             ScriptManager.RegisterStartupScript(
@@ -121,6 +131,9 @@ namespace ESIGWeb.Controls
             // desfaz todos os vínculos
             foreach (var cv in DatabaseHelper.ObterCargosVinculados(vid))
                 DatabaseHelper.DesvincularCargo(vid, cv.CargoId);
+
+            DatabaseHelper.ExcluirVencimento(vid);
+            CarregarDropdowns();
 
             // fecha modal
             ScriptManager.RegisterStartupScript(
@@ -140,6 +153,7 @@ namespace ESIGWeb.Controls
                 Tipo = ddlTipoNovo.SelectedValue
             };
             DatabaseHelper.InserirVencimento(v);
+            CarregarDropdowns();
 
             // 2) Fecha filho e reabre pai
             var script = $@"

@@ -235,6 +235,7 @@ namespace ESIGWeb.Data
                     }
                 }
 
+
             }
             return lista;
         }
@@ -419,8 +420,8 @@ namespace ESIGWeb.Data
         {
             const string sql = @"
               UPDATE vencimentos
-                 SET descricao         = :descricao
-                   , valor             = :valor
+                 SET 
+                    valor             = :valor
                    , forma_incidencia  = :forma
                    , tipo              = :tipo
                WHERE id = :pId";
@@ -428,7 +429,7 @@ namespace ESIGWeb.Data
             using (var conn = new OracleConnection(ConnectionString))
                 using (var cmd = new OracleCommand(sql, conn))
             {
-                cmd.Parameters.Add("descricao", OracleDbType.Varchar2).Value = v.Descricao;
+                //cmd.Parameters.Add("descricao", OracleDbType.Varchar2).Value = v.Descricao;
                 cmd.Parameters.Add("valor", OracleDbType.Decimal).Value = v.Valor;
                 cmd.Parameters.Add("forma", OracleDbType.Char).Value = v.FormaIncidencia;
                 cmd.Parameters.Add("tipo", OracleDbType.Char).Value = v.Tipo;
@@ -511,6 +512,21 @@ namespace ESIGWeb.Data
 
                 cmd.Parameters.Add("vid", OracleDbType.Int32).Value = vencimentoId;
                 cmd.Parameters.Add("cid", OracleDbType.Int32).Value = cargoId;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static void ExcluirVencimento(int vencimentoId)
+        {
+            const string sql = @"
+              DELETE FROM vencimentos
+               WHERE id = :vid";
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+
+                cmd.Parameters.Add("vid", OracleDbType.Int32).Value = vencimentoId;
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
