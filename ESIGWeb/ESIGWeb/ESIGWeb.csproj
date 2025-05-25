@@ -154,6 +154,7 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="Controls\CalcularSalarioModal.ascx" />
     <Content Include="Controls\RowModal.ascx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -224,6 +225,13 @@
     <Content Include="Bundle.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\CalcularSalarioModal.ascx.cs">
+      <DependentUpon>CalcularSalarioModal.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\CalcularSalarioModal.ascx.designer.cs">
+      <DependentUpon>CalcularSalarioModal.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Controls\RowModal.ascx.cs">
       <DependentUpon>RowModal.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -238,6 +246,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Pessoa.cs" />
+    <Compile Include="Models\Vencimentos.cs" />
     <Compile Include="Pages\Listagem.aspx.cs">
       <DependentUpon>Listagem.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

@@ -93,12 +93,12 @@ namespace ESIGWeb.Controls
                 gridDebitos.DataBind();
             }
 
-            // garante que a modal permaneça aberta após o async postback
+            updRowModalBody.Update(); // Atualiza só o conteúdo!
             ScriptManager.RegisterStartupScript(
                 this,
                 GetType(),
                 "showRowModal",
-                "new bootstrap.Modal(document.getElementById('rowModal')).show();",
+                "var modalEl = document.getElementById('rowModal'); if(modalEl){var m=bootstrap.Modal.getOrCreateInstance(modalEl);m.show();}",
                 true
             );
         }

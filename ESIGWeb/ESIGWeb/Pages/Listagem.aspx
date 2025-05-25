@@ -1,5 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Listagem.aspx.cs" Inherits="ESIGWeb.Listagem" %>
 <%@ Register TagPrefix="uc" TagName="RowModal" Src="~/Controls/RowModal.ascx" %>
+<%@ Register TagPrefix="uc" TagName="CalcularSalarioModal" Src="~/Controls/CalcularSalarioModal.ascx" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -52,6 +53,12 @@
     </asp:GridView>
 
     <asp:Button
+      ID="btnCalcularSalario"
+      runat="server"
+      Text="Calcular Salários"
+      CssClass="btn btn-primary mt-3"
+      OnClick="btnCalcularSalario_Click" />
+    <asp:Button
       ID="btnCalcular"
       runat="server"
       Text="Recalcular Salários"
@@ -67,6 +74,7 @@
 
 
     <uc:RowModal ID="RowModal1" runat="server" />
+    <uc:CalcularSalarioModal ID="CalcularSalarioModal1" runat="server" />
   </form>
 </body>
 </html>
@@ -143,5 +151,55 @@
 
         // Abre a modal
         modal.show();
+    }
+</script>
+
+
+<!-- Script JS local para adicionar linhas -->
+<script type="text/javascript">
+    function addRow(tableId) {
+        var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+        var row = table.insertRow();
+        row.innerHTML = `
+      <td><input type="text" class="form-control" /></td>
+      <td><input type="number" class="form-control" min="0" step="0.01" /></td>
+      <td>
+        <select class="form-select">
+          <option value="V">Valor</option>
+          <option value="P">%</option>
+        </select>
+      </td>
+      <td>
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove();">🗑️</button>
+      </td>
+    `;
+    }
+</script>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script type="text/javascript">
+    function addRowSalario(tableId) {
+        var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+        var row = table.insertRow();
+        row.innerHTML = `
+    <td>
+      <input type="text" class="form-control form-control-sm" />
+    </td>
+    <td>
+      <input type="number" class="form-control form-control-sm text-end" min="0" step="0.01" />
+    </td>
+    <td>
+      <select class="form-select form-select-sm">
+        <option value="V">V</option>
+        <option value="P">%</option>
+      </select>
+    </td>
+    <td>
+      <button type="button" class="btn btn-danger btn-sm" title="Remover" onclick="this.closest('tr').remove();">
+        <i class="bi bi-trash"></i>
+      </button>
+    </td>
+  `;
     }
 </script>

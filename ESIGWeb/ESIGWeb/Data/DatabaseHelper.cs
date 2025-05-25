@@ -151,10 +151,11 @@ namespace ESIGWeb.Data
             return dt;
         }
 
-        public static List<VencimentoItem> ObterDadosFinanceiroPessoa(int cargoId, string tipo)
+        public static List<Vencimentos> ObterDadosFinanceiroPessoa(int cargoId, string tipo)
         {
             const string sql = @"
                 SELECT
+                    v.id,
                     v.descricao,
                     v.valor,
                     v.forma_incidencia
@@ -165,7 +166,7 @@ namespace ESIGWeb.Data
                   AND v.tipo      = :pTipo
                 ORDER BY v.id";
 
-            var lista = new List<VencimentoItem>();
+            var lista = new List<Vencimentos>();
 
             using (var conn = new OracleConnection(ConnectionString))
             using (var cmd = new OracleCommand(sql, conn))
@@ -178,8 +179,9 @@ namespace ESIGWeb.Data
                 {
                     while (rdr.Read())
                     {
-                        lista.Add(new VencimentoItem
+                        lista.Add(new Vencimentos
                         {
+                            id = rdr.GetInt32(rdr.GetOrdinal("id")),
                             Descricao = rdr.GetString(rdr.GetOrdinal("descricao")),
                             Valor = rdr.GetDecimal(rdr.GetOrdinal("valor")),
                             FormaIncidencia = rdr.GetString(rdr.GetOrdinal("forma_incidencia"))

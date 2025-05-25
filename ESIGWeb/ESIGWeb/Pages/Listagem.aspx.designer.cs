@@ -33,6 +33,15 @@ namespace ESIGWeb
         protected global::System.Web.UI.WebControls.GridView gridPessoas;
 
         /// <summary>
+        /// Controle btnCalcularSalario.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCalcularSalario;
+
+        /// <summary>
         /// Controle btnCalcular.
         /// </summary>
         /// <remarks>
@@ -58,5 +67,14 @@ namespace ESIGWeb
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
         protected global::ESIGWeb.Controls.RowModal RowModal1;
+
+        /// <summary>
+        /// Controle CalcularSalarioModal1.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::ESIGWeb.Controls.CalcularSalarioModal CalcularSalarioModal1;
     }
 }
