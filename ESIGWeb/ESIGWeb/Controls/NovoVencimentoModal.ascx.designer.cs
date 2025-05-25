@@ -11,52 +11,70 @@ namespace ESIGWeb.Controls
 {
 
 
-    public partial class CalcularSalarioModal
+    public partial class NovoVencimentoModal
     {
 
         /// <summary>
-        /// Controle updCalcularSalarioBody.
+        /// Controle novoVencModal.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel updCalcularSalarioBody;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl novoVencModal;
 
         /// <summary>
-        /// Controle ddlCargo.
+        /// Controle updNovoVenc.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCargo;
+        protected global::System.Web.UI.UpdatePanel updNovoVenc;
 
         /// <summary>
-        /// Controle gridCreditos.
+        /// Controle txtDescNovo.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gridCreditos;
+        protected global::System.Web.UI.WebControls.TextBox txtDescNovo;
 
         /// <summary>
-        /// Controle gridDebitos.
+        /// Controle txtValorNovo.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gridDebitos;
+        protected global::System.Web.UI.WebControls.TextBox txtValorNovo;
 
         /// <summary>
-        /// Controle btnSalvar.
+        /// Controle ddlFormaNovo.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSalvar;
+        protected global::System.Web.UI.WebControls.DropDownList ddlFormaNovo;
+
+        /// <summary>
+        /// Controle ddlTipoNovo.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlTipoNovo;
+
+        /// <summary>
+        /// Controle btnSalvarNovo.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSalvarNovo;
     }
 }

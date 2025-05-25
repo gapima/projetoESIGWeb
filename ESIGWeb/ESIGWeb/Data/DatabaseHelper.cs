@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace ESIGWeb.Data
 {
@@ -28,6 +29,19 @@ namespace ESIGWeb.Data
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static async Task ExecutarProcedureCalculoAsync()
+        {
+            using (var conn = new OracleConnection(ConnectionString))
+            {
+               await conn.OpenAsync();
+                using (var cmd = new OracleCommand("SP_CALCULAR_SALARIOS", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
@@ -181,7 +195,7 @@ namespace ESIGWeb.Data
                     {
                         lista.Add(new Vencimentos
                         {
-                            id = rdr.GetInt32(rdr.GetOrdinal("id")),
+                            Id = rdr.GetInt32(rdr.GetOrdinal("id")),
                             Descricao = rdr.GetString(rdr.GetOrdinal("descricao")),
                             Valor = rdr.GetDecimal(rdr.GetOrdinal("valor")),
                             FormaIncidencia = rdr.GetString(rdr.GetOrdinal("forma_incidencia"))
@@ -191,6 +205,67 @@ namespace ESIGWeb.Data
             }
 
             return lista;
+        }
+
+        public static List<Vencimentos> ObterTodosVencimentos()
+        {
+            const string sql = @"
+              SELECT id, descricao, valor, forma_incidencia, tipo
+                FROM vencimentos
+               ORDER BY descricao";
+
+            var lista = new List<Vencimentos>();
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+                conn.Open();
+                using (var rdr = cmd.ExecuteReader())
+                {
+
+                    while (rdr.Read())
+                    {
+                        lista.Add(new Vencimentos
+                        {
+                            Id = rdr.GetInt32(0),
+                            Descricao = rdr.GetString(1),
+                            Valor = rdr.GetDecimal(2),
+                            FormaIncidencia = rdr.GetString(3),
+                            Tipo = rdr.GetString(4)
+                        });
+                    }
+                }
+
+            }
+            return lista;
+        }
+
+        // 2) OBTER UM VENCIMENTO POR ID
+        public static Vencimentos ObterVencimento(int id)
+        {
+            const string sql = @"
+              SELECT id, descricao, valor, forma_incidencia, tipo
+                FROM vencimentos
+               WHERE id = :pId";
+
+            using (var conn = new OracleConnection(ConnectionString))
+                using (var cmd = new OracleCommand(sql, conn))
+            {
+                cmd.Parameters.Add("pId", OracleDbType.Int32).Value = id;
+                conn.Open();
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    if (!rdr.Read()) return null;
+
+                    return new Vencimentos
+                    {
+                        Id = rdr.GetInt32(0),
+                        Descricao = rdr.GetString(1),
+                        Valor = rdr.GetDecimal(2),
+                        FormaIncidencia = rdr.GetString(3),
+                        Tipo = rdr.GetString(4)
+                    };
+                }
+            }
         }
 
 
@@ -266,42 +341,42 @@ namespace ESIGWeb.Data
             return 0;
         }
 
-        public static int InserirVencimento(Vencimentos v)
-        {
-            const string sql = @"
-                INSERT INTO VENCIMENTOS (
-                    descricao,
-                    valor,
-                    forma_incidencia,
-                    tipo
-                ) VALUES (
-                    :descricao,
-                    :valor,
-                    :forma,
-                    :tipo
-                )
-                RETURNING id INTO :newId";
+        //public static int InserirVencimento(Vencimentos v)
+        //{
+        //    const string sql = @"
+        //        INSERT INTO VENCIMENTOS (
+        //            descricao,
+        //            valor,
+        //            forma_incidencia,
+        //            tipo
+        //        ) VALUES (
+        //            :descricao,
+        //            :valor,
+        //            :forma,
+        //            :tipo
+        //        )
+        //        RETURNING id INTO :newId";
 
-            using (var conn = new OracleConnection(ConnectionString))
-            using (var cmd = new OracleCommand(sql, conn))
-            {
-                // parâmetros de entrada
-                cmd.Parameters.Add("descricao", OracleDbType.Varchar2).Value = v.Descricao;
-                cmd.Parameters.Add("valor", OracleDbType.Decimal).Value = v.Valor;
-                cmd.Parameters.Add("forma", OracleDbType.Char).Value = v.FormaIncidencia;
-                cmd.Parameters.Add("tipo", OracleDbType.Char).Value = v.Tipo;
+        //    using (var conn = new OracleConnection(ConnectionString))
+        //    using (var cmd = new OracleCommand(sql, conn))
+        //    {
+        //        // parâmetros de entrada
+        //        cmd.Parameters.Add("descricao", OracleDbType.Varchar2).Value = v.Descricao;
+        //        cmd.Parameters.Add("valor", OracleDbType.Decimal).Value = v.Valor;
+        //        cmd.Parameters.Add("forma", OracleDbType.Char).Value = v.FormaIncidencia;
+        //        cmd.Parameters.Add("tipo", OracleDbType.Char).Value = v.Tipo;
 
-                // parâmetro de saída para capturar o ID gerado
-                var pNewId = cmd.Parameters.Add("newId", OracleDbType.Int32);
-                pNewId.Direction = ParameterDirection.Output;
+        //        // parâmetro de saída para capturar o ID gerado
+        //        var pNewId = cmd.Parameters.Add("newId", OracleDbType.Int32);
+        //        pNewId.Direction = ParameterDirection.Output;
 
-                conn.Open();
-                cmd.ExecuteNonQuery();
+        //        conn.Open();
+        //        cmd.ExecuteNonQuery();
 
-                // obtém o valor do OUT e converte para int
-                return Convert.ToInt32(pNewId.Value.ToString());
-            }
-        }
+        //        // obtém o valor do OUT e converte para int
+        //        return Convert.ToInt32(pNewId.Value.ToString());
+        //    }
+        //}
 
 
         public static void InserirCargoVencimento(int cargoId, int vencimentoId)
@@ -320,7 +395,134 @@ namespace ESIGWeb.Data
             }
         }
 
+        public static int InserirVencimento(Vencimentos v)
+        {
+            const string sql = @"
+              INSERT INTO vencimentos (descricao, valor, forma_incidencia, tipo)
+              VALUES (:descricao, :valor, :forma, :tipo)
+              RETURNING id INTO :pOutId";
 
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+                cmd.Parameters.Add("descricao", OracleDbType.Varchar2).Value = v.Descricao;
+                cmd.Parameters.Add("valor", OracleDbType.Decimal).Value = v.Valor;
+                cmd.Parameters.Add("forma", OracleDbType.Char).Value = v.FormaIncidencia;
+                cmd.Parameters.Add("tipo", OracleDbType.Char).Value = v.Tipo;
+
+                var outId = new OracleParameter("pOutId", OracleDbType.Int32)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                cmd.Parameters.Add(outId);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+                return Convert.ToInt32(outId.Value);
+            }
+        }
+
+        // 4) ATUALIZAR UM VENCIMENTO EXISTENTE
+        public static void AtualizarVencimento(Vencimentos v)
+        {
+            const string sql = @"
+              UPDATE vencimentos
+                 SET descricao         = :descricao
+                   , valor             = :valor
+                   , forma_incidencia  = :forma
+                   , tipo              = :tipo
+               WHERE id = :pId";
+
+            using (var conn = new OracleConnection(ConnectionString))
+                using (var cmd = new OracleCommand(sql, conn))
+            {
+                cmd.Parameters.Add("descricao", OracleDbType.Varchar2).Value = v.Descricao;
+                cmd.Parameters.Add("valor", OracleDbType.Decimal).Value = v.Valor;
+                cmd.Parameters.Add("forma", OracleDbType.Char).Value = v.FormaIncidencia;
+                cmd.Parameters.Add("tipo", OracleDbType.Char).Value = v.Tipo;
+                cmd.Parameters.Add("pId", OracleDbType.Int32).Value = v.Id;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        // 5) OBTER OS CARGOS VINCULADOS A UM VENCIMENTO
+        public static List<CargoVencimento> ObterCargosVinculados(int vencimentoId)
+        {
+            const string sql = @"
+              SELECT id, cargo_id, vencimento_id
+                FROM cargo_vencimentos
+               WHERE vencimento_id = :pVid";
+
+            var lista = new List<CargoVencimento>();
+            using (var conn = new OracleConnection(ConnectionString))
+                using (var cmd = new OracleCommand(sql, conn)){
+                cmd.Parameters.Add("pVid", OracleDbType.Int32).Value = vencimentoId;
+                conn.Open();
+
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        lista.Add(new CargoVencimento
+                        {
+                            Id = rdr.GetInt32(0),
+                            CargoId = rdr.GetInt32(1),
+                            VencimentoId = rdr.GetInt32(2)
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
+        // 6) VINCULAR UM CARGO A UM VENCIMENTO
+        public static void VincularCargo(int vencimentoId, int cargoId)
+        {
+            // evita duplicação
+            const string sqlChk = @"
+              SELECT COUNT(*) FROM cargo_vencimentos
+               WHERE vencimento_id = :vid AND cargo_id = :cid";
+            using (var conn = new OracleConnection(ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new OracleCommand(sqlChk, conn))
+                {
+                    cmd.Parameters.Add("vid", OracleDbType.Int32).Value = vencimentoId;
+                    cmd.Parameters.Add("cid", OracleDbType.Int32).Value = cargoId;
+                    var count = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (count > 0) return;
+                }
+                const string sqlIns = @"
+                  INSERT INTO cargo_vencimentos (cargo_id, vencimento_id)
+                  VALUES (:cid, :vid)";
+                using (var cmd2 = new OracleCommand(sqlIns, conn))
+                {
+                    cmd2.Parameters.Add("cid", OracleDbType.Int32).Value = cargoId;
+                    cmd2.Parameters.Add("vid", OracleDbType.Int32).Value = vencimentoId;
+                    cmd2.ExecuteNonQuery();
+                }
+            }
+
+
+        }
+
+        // 7) DESVINCULAR UM CARGO DE UM VENCIMENTO
+        public static void DesvincularCargo(int vencimentoId, int cargoId)
+        {
+            const string sql = @"
+              DELETE FROM cargo_vencimentos
+               WHERE vencimento_id = :vid
+                 AND cargo_id      = :cid";
+            using (var conn = new OracleConnection(ConnectionString))
+                using (var cmd = new OracleCommand(sql, conn)){
+
+                cmd.Parameters.Add("vid", OracleDbType.Int32).Value = vencimentoId;
+                cmd.Parameters.Add("cid", OracleDbType.Int32).Value = cargoId;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
 
         //delete
         public static void ExcluirPessoa(int id)

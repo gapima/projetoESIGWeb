@@ -2,6 +2,7 @@
 using ESIGWeb.Data;
 using System;
 using System.Data;
+using System.Threading.Tasks;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -40,9 +41,9 @@ namespace ESIGWeb
             e.Row.Style["cursor"] = "pointer";
         }
 
-        protected void btnCalcular_Click(object sender, EventArgs e)
+        protected async void btnCalcular_Click(object sender, EventArgs e)
         {
-            DatabaseHelper.ExecutarProcedureCalculo();
+            await Task.Run(() =>DatabaseHelper.ExecutarProcedureCalculoAsync());
             CarregarDados();
         }
 
@@ -118,31 +119,14 @@ namespace ESIGWeb
             );
         }
 
-        protected void btnCalcularSalario_Click(object sender, EventArgs e)
+        protected void btnVincularVencimentos_Click(object sender, EventArgs e)
         {
-            //CalcularSalarioModal1.PopularCargos();
-            var ddlCargo = CalcularSalarioModal1.FindControl("ddlCargo") as DropDownList;
-            if (ddlCargo != null)
-            {
-                var dt = DatabaseHelper.ObterTodosCargos();
-                ddlCargo.DataSource = dt;
-                ddlCargo.DataValueField = "id";
-                ddlCargo.DataTextField = "nome";
-                ddlCargo.DataBind();
-            }
-            var gridCreditos = CalcularSalarioModal1.FindControl("gridCreditos") as GridView;
-            var creditos = DatabaseHelper.ObterDadosFinanceiroPessoa(1, "C");
-            gridCreditos.DataSource = creditos;
-            gridCreditos.DataBind();
-
-            var gridDebitos = CalcularSalarioModal1.FindControl("gridDebitos") as GridView;
-            var debitos = DatabaseHelper.ObterDadosFinanceiroPessoa(1, "D");
-            gridDebitos.DataSource = debitos;
-            gridDebitos.DataBind();
-
-            // Script para abrir a modal
-            string script = "new bootstrap.Modal(document.getElementById('calcularSalarioModal')).show();";
-            ScriptManager.RegisterStartupScript(this, GetType(), "abrirCalcularSalarioModal", script, true);
+            // abre a modal principal de vinculação
+            ScriptManager.RegisterStartupScript(
+                this, GetType(),
+                "showVincular",
+                "new bootstrap.Modal(document.getElementById('vincularVencModal')).show();",
+                true);
         }
     }
 }

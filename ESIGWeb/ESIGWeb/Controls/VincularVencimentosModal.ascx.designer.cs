@@ -7,83 +7,101 @@
 // </gerado automaticamente>
 //------------------------------------------------------------------------------
 
-namespace ESIGWeb
+namespace ESIGWeb.Controls
 {
 
 
-    public partial class Listagem
+    public partial class VincularVencimentosModal
     {
 
         /// <summary>
-        /// Controle form1.
+        /// Controle updVincular.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.UpdatePanel updVincular;
 
         /// <summary>
-        /// Controle gridPessoas.
+        /// Controle ddlVencimentos.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gridPessoas;
+        protected global::System.Web.UI.WebControls.DropDownList ddlVencimentos;
 
         /// <summary>
-        /// Controle btnVincularVencimentos.
+        /// Controle btnNovoVencimento.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnVincularVencimentos;
+        protected global::System.Web.UI.WebControls.Button btnNovoVencimento;
 
         /// <summary>
-        /// Controle btnCalcular.
+        /// Controle txtValor.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCalcular;
+        protected global::System.Web.UI.WebControls.TextBox txtValor;
 
         /// <summary>
-        /// Controle btnAddPessoa.
+        /// Controle ddlForma.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddPessoa;
+        protected global::System.Web.UI.WebControls.DropDownList ddlForma;
 
         /// <summary>
-        /// Controle RowModal1.
+        /// Controle ddlTipo.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::ESIGWeb.Controls.RowModal RowModal1;
+        protected global::System.Web.UI.WebControls.DropDownList ddlTipo;
 
         /// <summary>
-        /// Controle VincularVencimentosModal2.
+        /// Controle rptCargos.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::ESIGWeb.Controls.VincularVencimentosModal VincularVencimentosModal2;
+        protected global::System.Web.UI.WebControls.Repeater rptCargos;
 
         /// <summary>
-        /// Controle NovoVencimentoModa1.
+        /// Controle btnExcluirVinc.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::ESIGWeb.Controls.NovoVencimentoModal NovoVencimentoModa1;
+        protected global::System.Web.UI.WebControls.Button btnExcluirVinc;
+
+        /// <summary>
+        /// Controle btnSalvarVinc.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSalvarVinc;
+
+        /// <summary>
+        /// Controle NovoVencimentoModal1.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::ESIGWeb.Controls.NovoVencimentoModal NovoVencimentoModal1;
     }
 }

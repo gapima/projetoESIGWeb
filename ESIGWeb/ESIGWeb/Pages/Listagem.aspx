@@ -1,6 +1,7 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Listagem.aspx.cs" Inherits="ESIGWeb.Listagem" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Listagem.aspx.cs" Inherits="ESIGWeb.Listagem" Async="true" %>
 <%@ Register TagPrefix="uc" TagName="RowModal" Src="~/Controls/RowModal.ascx" %>
-<%@ Register TagPrefix="uc" TagName="CalcularSalarioModal" Src="~/Controls/CalcularSalarioModal.ascx" %>
+<%@ Register TagPrefix="uc" TagName="VincularVencimentosModal" Src="~/Controls/VincularVencimentosModal.ascx" %>
+<%@ Register TagPrefix="uc" TagName="NovoVencimentoModal" Src="~/Controls/NovoVencimentoModal.ascx" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -53,11 +54,12 @@
     </asp:GridView>
 
     <asp:Button
-      ID="btnCalcularSalario"
-      runat="server"
-      Text="Calcular Salários"
-      CssClass="btn btn-primary mt-3"
-      OnClick="btnCalcularSalario_Click" />
+        ID="btnVincularVencimentos"
+        runat="server"
+        CssClass="btn btn-warning mt-3"
+        Text="Vincular Créditos/ Débitos"
+        OnClick="btnVincularVencimentos_Click" />
+
     <asp:Button
       ID="btnCalcular"
       runat="server"
@@ -74,7 +76,8 @@
 
 
     <uc:RowModal ID="RowModal1" runat="server" />
-    <uc:CalcularSalarioModal ID="CalcularSalarioModal1" runat="server" />
+    <uc:VincularVencimentosModal ID="VincularVencimentosModal2" runat="server" />
+    <uc:NovoVencimentoModal ID="NovoVencimentoModa1" runat="server" />
   </form>
 </body>
 </html>
@@ -155,7 +158,7 @@
 </script>
 
 
-<!-- Script JS local para adicionar linhas -->
+<%--<!-- Script JS local para adicionar linhas -->
 <script type="text/javascript">
     function addRow(tableId) {
         var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
@@ -174,13 +177,13 @@
       </td>
     `;
     }
-</script>
+</script>--%>
 <!-- bootstrap-icons -->
 <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-<script type="text/javascript">
+<%--<script type="text/javascript">
     function addRowSalario(tableId) {
         // 1) tenta achar a tabela
         let tbl = document.getElementById(tableId);
@@ -242,6 +245,28 @@
         </button>
       </td>
     `;
+    }
+</script>--%>
+
+<script>
+    function abrirModalNovoVencimento() {
+        var elemVenc = document.getElementById('vincularVencModal');
+        var modalVencimentos = elemVenc ? bootstrap.Modal.getInstance(elemVenc) : null;
+        if (modalVencimentos) {
+            modalVencimentos.hide();
+        } else {
+            console.warn('Modal de vencimentos não encontrado para esconder');
+        }
+
+        setTimeout(function () {
+            var elemNovo = document.getElementById('novoVencModal');
+            if (!elemNovo) {
+                console.error('Modal novo vencimento não encontrado no DOM');
+                return;
+            }
+            var modalNovo = bootstrap.Modal.getOrCreateInstance(elemNovo);
+            modalNovo.show();
+        }, 500);
     }
 </script>
 
