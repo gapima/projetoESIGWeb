@@ -44,7 +44,7 @@
                 <label for="txtValor">Valor</label>
                 <asp:TextBox ID="txtValor"
                              runat="server"
-                             CssClass="form-control" />
+                             CssClass="form-control valor-decimal" />
               </div>
               <div class="col-md-4">
                 <label for="ddlForma">Forma Incidência</label>
@@ -94,12 +94,12 @@
         <asp:Button ID="btnExcluirVinc"
                     runat="server"
                     CssClass="btn btn-danger"
-                    Text="Excluir vínculo"
+                    Text="Excluir"
                     OnClick="btnExcluirVinc_Click" />
         <asp:Button ID="btnSalvarVinc"
                     runat="server"
                     CssClass="btn btn-success"
-                    Text="Salvar vínculo"
+                    Text="Salvar"
                     OnClick="btnSalvarVinc_Click" />
         <button type="button"
                 class="btn btn-secondary"
@@ -134,8 +134,7 @@
         <div class="mb-3">
           <label for="txtValorNovo" class="form-label">Valor</label>
           <asp:TextBox ID="txtValorNovo" runat="server"
-                       CssClass="form-control" TextMode="Number"
-                       Attributes-step="0.01" />
+                       CssClass="form-control valor-decimal" />
         </div>
         <div class="mb-3">
           <label for="ddlFormaNovo" class="form-label">Forma Incidência</label>
@@ -210,6 +209,7 @@
             modalPaiEl.setAttribute('aria-hidden', 'true');
             modalPaiEl.setAttribute('style', 'display: none;');
 
+
             document.getElementById('<%= txtDescNovo.ClientID %>').value = '';
             document.getElementById('<%= txtValorNovo.ClientID %>').value = '';
             document.getElementById('<%= ddlFormaNovo.ClientID %>').selectedIndex = 0;
@@ -219,3 +219,33 @@
         }, 300); // espera a transição da primeira modal
     }
 </script>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".valor-decimal").forEach(function (input) {
+            input.addEventListener("input", function (e) {
+                // Remove tudo que não é número
+                let valor = input.value.replace(/\D/g, '');
+
+                // Se estiver vazio, zera
+                if (valor === '') {
+                    input.value = '';
+                    return;
+                }
+
+                // Converte para decimal em tempo real (2 casas)
+                let intValue = parseInt(valor);
+                let decimalValue = (intValue / 100).toFixed(2);
+
+                // Formata com vírgula (pt-BR)
+                input.value = decimalValue.replace('.', ',');
+            });
+
+            // (Opcional) Seleciona tudo ao focar, para facilitar digitação
+            input.addEventListener("focus", function () {
+                setTimeout(() => input.select(), 1);
+            });
+        });
+    });
+</script>
+

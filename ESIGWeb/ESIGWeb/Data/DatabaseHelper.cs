@@ -234,8 +234,6 @@ namespace ESIGWeb.Data
                         });
                     }
                 }
-
-
             }
             return lista;
         }

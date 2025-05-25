@@ -122,6 +122,8 @@ namespace ESIGWeb
         protected void btnVincularVencimentos_Click(object sender, EventArgs e)
         {
             // abre a modal principal de vinculação
+            LimparCampo(VincularVencimentosModal2, "txtValor");
+            VincularVencimentosModal2.CarregarDropdowns();
             ScriptManager.RegisterStartupScript(
                 this, GetType(),
                 "showVincular",
