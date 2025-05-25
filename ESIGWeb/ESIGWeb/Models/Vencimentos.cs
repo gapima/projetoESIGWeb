@@ -11,5 +11,8 @@ namespace ESIGWeb.Models
         public string Descricao { get; set; }
         public decimal Valor { get; set; }
         public string FormaIncidencia { get; set; }
+        public string Tipo { get; set; }
+        public List<CargoVencimento> CargoVencimento { get; set; }
+
     }
 }

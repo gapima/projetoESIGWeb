@@ -175,31 +175,77 @@
     `;
     }
 </script>
+<!-- bootstrap-icons -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <script type="text/javascript">
     function addRowSalario(tableId) {
-        var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
-        var row = table.insertRow();
+        // 1) tenta achar a tabela
+        let tbl = document.getElementById(tableId);
+        if (!tbl) {
+            console.warn("Tabela não encontrada, criando uma nova:", tableId);
+
+            // 2) cria tabela com cabeçalho
+            tbl = document.createElement("table");
+            tbl.id = tableId;
+            tbl.className = "table table-sm table-bordered align-middle mb-2";
+
+            // monta o thead
+            const thead = document.createElement("thead");
+            thead.innerHTML = `
+        <tr>
+          <th>Descrição</th>
+          <th>Valor</th>
+          <th>Incidência</th>
+          <th style="width:50px;">Ações</th>
+        </tr>`;
+            tbl.appendChild(thead);
+
+            // cria o tbody vazio
+            const tbody = document.createElement("tbody");
+            tbl.appendChild(tbody);
+
+            // anexa a tabela logo antes do botão "+ Adicionar …"
+            // supondo que o botão tenha um data-target para esta tabela
+            // vamos buscar o botão pela função onclick
+            const btn = document.querySelector(
+                `button[onclick*="${tableId}"]`
+            );
+            if (btn && btn.parentNode) {
+                btn.parentNode.insertBefore(tbl, btn);
+            } else {
+                // fallback: joga no modal-body
+                const modalBody = document.querySelector("#calcularSalarioModal .modal-body");
+                modalBody.appendChild(tbl);
+            }
+        }
+
+        // 3) pega o tbody (criado ou já existente)
+        const container = tbl.tBodies[0] || tbl;
+
+        // 4) insere a linha
+        const row = container.insertRow();
         row.innerHTML = `
-    <td>
-      <input type="text" class="form-control form-control-sm" />
-    </td>
-    <td>
-      <input type="number" class="form-control form-control-sm text-end" min="0" step="0.01" />
-    </td>
-    <td>
-      <select class="form-select form-select-sm">
-        <option value="V">V</option>
-        <option value="P">%</option>
-      </select>
-    </td>
-    <td>
-      <button type="button" class="btn btn-danger btn-sm" title="Remover" onclick="this.closest('tr').remove();">
-        <i class="bi bi-trash"></i>
-      </button>
-    </td>
-  `;
+      <td><input type="text" class="form-control form-control-sm" /></td>
+      <td><input type="number" class="form-control form-control-sm text-end" min="0" step="0.01" /></td>
+      <td>
+        <select class="form-select form-select-sm">
+          <option value="V">Valor</option>
+          <option value="P">%</option>
+        </select>
+      </td>
+      <td class="text-center">
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove();">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    `;
     }
 </script>
+
+
+
+
+

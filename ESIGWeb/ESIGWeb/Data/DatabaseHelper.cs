@@ -211,22 +211,6 @@ namespace ESIGWeb.Data
                        cargo_id        = :cargoId
                  WHERE id = :id";
 
-            // Se quiser INSERT quando p.Id == 0, descomente este bloco:
-            /*
-            const string sqlInsert = @"
-                INSERT INTO pessoa (
-                    nome, data_nascimento, email, usuario,
-                    cidade, cep, endereco, pais, telefone,
-                    cargo_id
-                )
-                VALUES (
-                    :nome, :dataNascimento, :email, :usuario,
-                    :cidade, :cep, :endereco, :pais, :telefone,
-                    :cargoId
-                )
-                RETURNING id INTO :newId";
-            */
-
             using (var conn = new OracleConnection(ConnectionString))
             using (var cmd = new OracleCommand(sqlUpdate, conn))
             {
@@ -248,27 +232,6 @@ namespace ESIGWeb.Data
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
-
-            /* 
-            // Exemplo de INSERT se precisar criar novos registros:
-            if (p.Id == 0)
-            {
-                using (var conn = new OracleConnection(ConnectionString))
-                using (var cmd  = new OracleCommand(sqlInsert, conn))
-                {
-                    cmd.CommandType = CommandType.Text;
-                    // adicionar mesmos parâmetros de p.Nome… p.CargoId
-                    var outParam = new OracleParameter("newId", OracleDbType.Int32)
-                    {
-                        Direction = ParameterDirection.Output
-                    };
-                    cmd.Parameters.Add(outParam);
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                    p.Id = Convert.ToInt32(outParam.Value);
-                }
-            }
-            */
         }
 
         //insert
@@ -301,6 +264,60 @@ namespace ESIGWeb.Data
                 cmd.ExecuteNonQuery();
             }
             return 0;
+        }
+
+        public static int InserirVencimento(Vencimentos v)
+        {
+            const string sql = @"
+                INSERT INTO VENCIMENTOS (
+                    descricao,
+                    valor,
+                    forma_incidencia,
+                    tipo
+                ) VALUES (
+                    :descricao,
+                    :valor,
+                    :forma,
+                    :tipo
+                )
+                RETURNING id INTO :newId";
+
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+                // parâmetros de entrada
+                cmd.Parameters.Add("descricao", OracleDbType.Varchar2).Value = v.Descricao;
+                cmd.Parameters.Add("valor", OracleDbType.Decimal).Value = v.Valor;
+                cmd.Parameters.Add("forma", OracleDbType.Char).Value = v.FormaIncidencia;
+                cmd.Parameters.Add("tipo", OracleDbType.Char).Value = v.Tipo;
+
+                // parâmetro de saída para capturar o ID gerado
+                var pNewId = cmd.Parameters.Add("newId", OracleDbType.Int32);
+                pNewId.Direction = ParameterDirection.Output;
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+
+                // obtém o valor do OUT e converte para int
+                return Convert.ToInt32(pNewId.Value.ToString());
+            }
+        }
+
+
+        public static void InserirCargoVencimento(int cargoId, int vencimentoId)
+        {
+            // supomos que a sequência gerada pelo IDENTITY se chama VENCIMENTOS_SEQ
+            const string sql = @"
+                  INSERT INTO CARGO_VENCIMENTOS (cargo_id, vencimento_id)
+                  VALUES (:cargoId, :vencimentoId)";
+            using (var conn = new OracleConnection(ConnectionString))
+            using (var cmd = new OracleCommand(sql, conn))
+            {
+                cmd.Parameters.Add("cargoId", OracleDbType.Int32).Value = cargoId;
+                cmd.Parameters.Add("vencimentoId", OracleDbType.Int32).Value = vencimentoId;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
 
 

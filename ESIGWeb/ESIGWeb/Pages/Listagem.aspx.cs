@@ -144,8 +144,5 @@ namespace ESIGWeb
             string script = "new bootstrap.Modal(document.getElementById('calcularSalarioModal')).show();";
             ScriptManager.RegisterStartupScript(this, GetType(), "abrirCalcularSalarioModal", script, true);
         }
-
-
-
     }
 }
