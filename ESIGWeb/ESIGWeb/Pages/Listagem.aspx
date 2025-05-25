@@ -1,7 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Listagem.aspx.cs" Inherits="ESIGWeb.Listagem" Async="true" %>
 <%@ Register TagPrefix="uc" TagName="RowModal" Src="~/Controls/RowModal.ascx" %>
 <%@ Register TagPrefix="uc" TagName="VincularVencimentosModal" Src="~/Controls/VincularVencimentosModal.ascx" %>
-<%@ Register TagPrefix="uc" TagName="NovoVencimentoModal" Src="~/Controls/NovoVencimentoModal.ascx" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -77,7 +76,6 @@
 
     <uc:RowModal ID="RowModal1" runat="server" />
     <uc:VincularVencimentosModal ID="VincularVencimentosModal2" runat="server" />
-    <uc:NovoVencimentoModal ID="NovoVencimentoModa1" runat="server" />
   </form>
 </body>
 </html>
@@ -126,149 +124,40 @@
   });
 </script>
 
-<script type="text/javascript">
-    function openNewPessoaModal() {
-        // Obtém referência à modal
-        var modalEl = document.getElementById('rowModal');
-        var modal = new bootstrap.Modal(modalEl);
-
-        // Limpa todos os campos da aba Pessoa
-      document.getElementById('<%= RowModal1.FindControl("txtPessoaId").ClientID %>').value = '0';
-      document.getElementById('<%= RowModal1.FindControl("txtPessoaNome").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtDataNascimento").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtEmail").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtUsuario").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtCidade").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtCEP").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtEndereco").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtPais").ClientID %>').value = '';
-      document.getElementById('<%= RowModal1.FindControl("txtTelefone").ClientID %>').value = '';
-
-    // Zera o dropdown de cargos (seleciona o primeiro item “-- selecione --”)
-    var ddl = document.getElementById('<%= RowModal1.FindControl("ddlCargo").ClientID %>');
-    if (ddl) ddl.selectedIndex = 0;
-
-    // Esconde mensagens de validação
-    var valSum = document.querySelector('#<%= RowModal1.ClientID %> .alert');
-        if (valSum) valSum.style.display = 'none';
-
-        // Abre a modal
-        modal.show();
-    }
-</script>
-
-
-<%--<!-- Script JS local para adicionar linhas -->
-<script type="text/javascript">
-    function addRow(tableId) {
-        var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
-        var row = table.insertRow();
-        row.innerHTML = `
-      <td><input type="text" class="form-control" /></td>
-      <td><input type="number" class="form-control" min="0" step="0.01" /></td>
-      <td>
-        <select class="form-select">
-          <option value="V">Valor</option>
-          <option value="P">%</option>
-        </select>
-      </td>
-      <td>
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove();">🗑️</button>
-      </td>
-    `;
-    }
-</script>--%>
-<!-- bootstrap-icons -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
 <%--<script type="text/javascript">
-    function addRowSalario(tableId) {
-        // 1) tenta achar a tabela
-        let tbl = document.getElementById(tableId);
-        if (!tbl) {
-            console.warn("Tabela não encontrada, criando uma nova:", tableId);
+    function openNewVencimentoModal() {
+        // 1) Esconde o modal pai
+        var paiEl = document.getElementById('vincularVencModal');
+        var paiModal = bootstrap.Modal.getInstance(paiEl);
+        if (paiModal) paiModal.hide();
 
-            // 2) cria tabela com cabeçalho
-            tbl = document.createElement("table");
-            tbl.id = tableId;
-            tbl.className = "table table-sm table-bordered align-middle mb-2";
-
-            // monta o thead
-            const thead = document.createElement("thead");
-            thead.innerHTML = `
-        <tr>
-          <th>Descrição</th>
-          <th>Valor</th>
-          <th>Incidência</th>
-          <th style="width:50px;">Ações</th>
-        </tr>`;
-            tbl.appendChild(thead);
-
-            // cria o tbody vazio
-            const tbody = document.createElement("tbody");
-            tbl.appendChild(tbody);
-
-            // anexa a tabela logo antes do botão "+ Adicionar …"
-            // supondo que o botão tenha um data-target para esta tabela
-            // vamos buscar o botão pela função onclick
-            const btn = document.querySelector(
-                `button[onclick*="${tableId}"]`
-            );
-            if (btn && btn.parentNode) {
-                btn.parentNode.insertBefore(tbl, btn);
-            } else {
-                // fallback: joga no modal-body
-                const modalBody = document.querySelector("#calcularSalarioModal .modal-body");
-                modalBody.appendChild(tbl);
-            }
-        }
-
-        // 3) pega o tbody (criado ou já existente)
-        const container = tbl.tBodies[0] || tbl;
-
-        // 4) insere a linha
-        const row = container.insertRow();
-        row.innerHTML = `
-      <td><input type="text" class="form-control form-control-sm" /></td>
-      <td><input type="number" class="form-control form-control-sm text-end" min="0" step="0.01" /></td>
-      <td>
-        <select class="form-select form-select-sm">
-          <option value="V">Valor</option>
-          <option value="P">%</option>
-        </select>
-      </td>
-      <td class="text-center">
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove();">
-          <i class="bi bi-trash"></i>
-        </button>
-      </td>
-    `;
-    }
-</script>--%>
-
-<script>
-    function abrirModalNovoVencimento() {
-        var elemVenc = document.getElementById('vincularVencModal');
-        var modalVencimentos = elemVenc ? bootstrap.Modal.getInstance(elemVenc) : null;
-        if (modalVencimentos) {
-            modalVencimentos.hide();
-        } else {
-            console.warn('Modal de vencimentos não encontrado para esconder');
-        }
-
+        // 2) Aguarda para garantir que o DOM tenha removido o backdrop e foco
         setTimeout(function () {
-            var elemNovo = document.getElementById('novoVencModal');
-            if (!elemNovo) {
-                console.error('Modal novo vencimento não encontrado no DOM');
+            // 3) Obtém o elemento do modal filho
+            var filhoEl = document.getElementById('novoVencModal');
+            if (!filhoEl) {
+                console.error('Modal filho não encontrado');
                 return;
             }
-            var modalNovo = bootstrap.Modal.getOrCreateInstance(elemNovo);
-            modalNovo.show();
-        }, 500);
+            // 4) Cria/obtém a instância sem fazer o foco automático
+            var filhoModal = bootstrap.Modal.getOrCreateInstance(filhoEl, {
+                backdrop: 'static', // opcional
+                focus: false       // **ESSENCIAL** para desativar o focus‐trap automático
+            });
+            // 5) Exibe o modal filho
+            filhoModal.show();
+
+            // 6) manualmente coloca foco no campo Descrição
+            var desc = filhoEl.querySelector('input[id$="txtDescNovo"]');
+            if (desc) desc.focus();
+        }, 200);
     }
-</script>
+</script>--%>
+
+
+
+
+
 
 
 

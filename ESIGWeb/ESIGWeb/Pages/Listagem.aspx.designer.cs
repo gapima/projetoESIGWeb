@@ -76,14 +76,5 @@ namespace ESIGWeb
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
         protected global::ESIGWeb.Controls.VincularVencimentosModal VincularVencimentosModal2;
-
-        /// <summary>
-        /// Controle NovoVencimentoModa1.
-        /// </summary>
-        /// <remarks>
-        /// Campo gerado automaticamente.
-        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
-        /// </remarks>
-        protected global::ESIGWeb.Controls.NovoVencimentoModal NovoVencimentoModa1;
     }
 }

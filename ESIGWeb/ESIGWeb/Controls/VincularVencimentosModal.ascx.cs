@@ -129,17 +129,32 @@ namespace ESIGWeb.Controls
                 true);
         }
 
-        protected void btnNovoVencimento_Click(object sender, EventArgs e)
+        protected void btnSalvarNovo_Click(object sender, EventArgs e)
         {
-            // Pega o ClientID da modal filha
-            var child = NovoVencimentoModal1;
-            var modalId = child.ModalClientID;
+            // 1) Persista o novo vencimento
+            var v = new Vencimentos
+            {
+                Descricao = txtDescNovo.Text.Trim(),
+                Valor = decimal.Parse(txtValorNovo.Text),
+                FormaIncidencia = ddlFormaNovo.SelectedValue,
+                Tipo = ddlTipoNovo.SelectedValue
+            };
+            DatabaseHelper.InserirVencimento(v);
 
+            // 2) Fecha filho e reabre pai
             var script = $@"
-              var m = new bootstrap.Modal(document.getElementById('{modalId}'));
-              m.show();
+              bootstrap.Modal.getInstance(
+                document.getElementById('{novoVencModal.ClientID}')
+              ).hide();
+
+              setTimeout(function(){{
+                new bootstrap.Modal(
+                  document.getElementById('{vincularVencModal.ClientID}')
+                ).show();
+              }}, 200);
             ";
-            ScriptManager.RegisterStartupScript(this, GetType(), "showNovoVenc", script, true);
+            ScriptManager.RegisterStartupScript(this, GetType(), "afterNovoVenc", script, true);
         }
+
     }
 }

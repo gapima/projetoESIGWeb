@@ -154,7 +154,6 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Site.css" />
-    <Content Include="Controls\NovoVencimentoModal.ascx" />
     <Content Include="Controls\RowModal.ascx" />
     <Content Include="Controls\VincularVencimentosModal.ascx" />
     <Content Include="favicon.ico" />
@@ -226,13 +225,6 @@
     <Content Include="Bundle.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\NovoVencimentoModal.ascx.cs">
-      <DependentUpon>NovoVencimentoModal.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Controls\NovoVencimentoModal.ascx.designer.cs">
-      <DependentUpon>NovoVencimentoModal.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Controls\RowModal.ascx.cs">
       <DependentUpon>RowModal.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

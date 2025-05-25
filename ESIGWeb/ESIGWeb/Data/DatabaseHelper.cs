@@ -395,12 +395,11 @@ namespace ESIGWeb.Data
             }
         }
 
-        public static int InserirVencimento(Vencimentos v)
+        public static void InserirVencimento(Vencimentos v)
         {
             const string sql = @"
               INSERT INTO vencimentos (descricao, valor, forma_incidencia, tipo)
-              VALUES (:descricao, :valor, :forma, :tipo)
-              RETURNING id INTO :pOutId";
+              VALUES (:descricao, :valor, :forma, :tipo)";
 
             using (var conn = new OracleConnection(ConnectionString))
             using (var cmd = new OracleCommand(sql, conn))
@@ -410,15 +409,8 @@ namespace ESIGWeb.Data
                 cmd.Parameters.Add("forma", OracleDbType.Char).Value = v.FormaIncidencia;
                 cmd.Parameters.Add("tipo", OracleDbType.Char).Value = v.Tipo;
 
-                var outId = new OracleParameter("pOutId", OracleDbType.Int32)
-                {
-                    Direction = ParameterDirection.Output
-                };
-                cmd.Parameters.Add(outId);
-
                 conn.Open();
                 cmd.ExecuteNonQuery();
-                return Convert.ToInt32(outId.Value);
             }
         }
 
