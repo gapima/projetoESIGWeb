@@ -10,6 +10,7 @@ namespace ESIGWeb.Controls
     public partial class RowModal : UserControl, IPostBackEventHandler
     {
         private readonly PessoaService _pessoaService = new PessoaService();
+
         public event EventHandler PessoaSalvaSucesso;
 
         public async void RaisePostBackEvent(string eventArgument)
@@ -67,6 +68,11 @@ namespace ESIGWeb.Controls
         }
         protected async void btnSavePessoa_Click(object sender, EventArgs e)
         {
+            if (!Page.IsValid)
+            {
+                ScriptUtils.ShowModal(Page, "rowModal"); // Função JS que reabre o modal
+                return;
+            }
             try
             {
                 List<string> erros;
@@ -137,6 +143,11 @@ namespace ESIGWeb.Controls
                   if(m) m.hide();
                   {postbackRef};
                 ";
+
+                if (this.Page is Listagem page)
+                {
+                    await page.RecarregarGridAsync();
+                }
 
                 ScriptManager.RegisterStartupScript(
                     this,

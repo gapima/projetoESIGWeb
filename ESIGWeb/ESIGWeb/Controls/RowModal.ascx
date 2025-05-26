@@ -34,11 +34,11 @@
                   <!-- Dados da Pessoa -->
                   <div class="col-md-6">
                     <h6>Dados da Pessoa</h6>
-                    <!-- ID -->
+                    <!-- ID (somente leitura) -->
                     <div class="mb-2 row">
-                      <label class="col-sm-4 col-form-label" for="txtPessoaId">ID:</label>
+                      <label class="col-sm-4 col-form-label" for="txtPessoaId"></label>
                       <div class="col-sm-8">
-                        <asp:TextBox ID="txtPessoaId" runat="server" CssClass="form-control" ReadOnly="true" />
+                        <asp:TextBox ID="txtPessoaId" runat="server" CssClass="form-control" ReadOnly="true"  Visible="false" />
                       </div>
                     </div>
                     <!-- Nome -->
@@ -88,6 +88,13 @@
                       <label class="col-sm-4 col-form-label" for="txtUsuario">Usuário:</label>
                       <div class="col-sm-8">
                         <asp:TextBox ID="txtUsuario" runat="server" CssClass="form-control" />
+                        <asp:RequiredFieldValidator 
+                          ID="reqUsuario" 
+                          runat="server" 
+                          ControlToValidate="txtUsuario"
+                          ErrorMessage="* Obrigatório" 
+                          Display="Dynamic" 
+                          CssClass="text-danger" />
                       </div>
                     </div>
                   </div>
@@ -117,6 +124,13 @@
                       <label class="col-sm-4 col-form-label" for="txtCidade">Cidade:</label>
                       <div class="col-sm-8">
                         <asp:TextBox ID="txtCidade" runat="server" CssClass="form-control" />
+                        <asp:RequiredFieldValidator
+                          ID="reqCidade"
+                          runat="server"
+                          ControlToValidate="txtCidade"
+                          ErrorMessage="* Obrigatório"
+                          Display="Dynamic"
+                          CssClass="text-danger" />
                       </div>
                     </div>
                     <!-- Endereço -->
@@ -124,6 +138,13 @@
                       <label class="col-sm-4 col-form-label" for="txtEndereco">Endereço:</label>
                       <div class="col-sm-8">
                         <asp:TextBox ID="txtEndereco" runat="server" CssClass="form-control" />
+                        <asp:RequiredFieldValidator
+                          ID="reqEndereco"
+                          runat="server"
+                          ControlToValidate="txtEndereco"
+                          ErrorMessage="* Obrigatório"
+                          Display="Dynamic"
+                          CssClass="text-danger" />
                       </div>
                     </div>
                     <!-- País -->
@@ -131,6 +152,13 @@
                       <label class="col-sm-4 col-form-label" for="txtPais">País:</label>
                       <div class="col-sm-8">
                         <asp:TextBox ID="txtPais" runat="server" CssClass="form-control" />
+                        <asp:RequiredFieldValidator
+                          ID="reqPais"
+                          runat="server"
+                          ControlToValidate="txtPais"
+                          ErrorMessage="* Obrigatório"
+                          Display="Dynamic"
+                          CssClass="text-danger" />
                       </div>
                     </div>
                     <!-- Telefone -->
@@ -138,6 +166,13 @@
                       <label class="col-sm-4 col-form-label" for="txtTelefone">Telefone:</label>
                       <div class="col-sm-8">
                         <asp:TextBox ID="txtTelefone" runat="server" CssClass="form-control" />
+                        <asp:RequiredFieldValidator
+                          ID="reqTelefone"
+                          runat="server"
+                          ControlToValidate="txtTelefone"
+                          ErrorMessage="* Obrigatório"
+                          Display="Dynamic"
+                          CssClass="text-danger" />
                       </div>
                     </div>
                   </div>
@@ -155,7 +190,18 @@
                           runat="server" 
                           CssClass="form-select"
                           AutoPostBack="true"
-                          OnSelectedIndexChanged="ddlCargo_SelectedIndexChanged" />
+                          OnSelectedIndexChanged="ddlCargo_SelectedIndexChanged">
+                          <asp:ListItem Value="">Selecione...</asp:ListItem>
+                          <%-- Adicione aqui os cargos dinamicamente no code-behind ou declarados --%>
+                        </asp:DropDownList>
+                        <asp:RequiredFieldValidator
+                          ID="reqCargo"
+                          runat="server"
+                          ControlToValidate="ddlCargo"
+                          InitialValue=""
+                          ErrorMessage="* Selecione um cargo"
+                          Display="Dynamic"
+                          CssClass="text-danger" />
                       </div>
                     </div>
                   </div>
@@ -237,7 +283,8 @@
           runat="server"
           Text="Salvar"
           CssClass="btn btn-primary"
-          OnClick="btnSavePessoa_Click" />
+          OnClick="btnSavePessoa_Click"
+          CausesValidation="true" />
 
         <asp:Button
           ID="btnDeletePessoa"

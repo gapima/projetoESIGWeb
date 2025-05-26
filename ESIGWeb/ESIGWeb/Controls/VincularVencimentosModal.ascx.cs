@@ -14,6 +14,7 @@ namespace ESIGWeb.Controls
     public partial class VincularVencimentosModal : UserControl
     {
         private readonly VencimentoService _vencimentoService = new VencimentoService();
+        public event EventHandler PessoaSalvaSucesso;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -75,6 +76,11 @@ namespace ESIGWeb.Controls
 
         protected async void btnSalvarVinc_Click(object sender, EventArgs e)
         {
+            if (!Page.IsValid)
+            {
+                ScriptUtils.ShowModal(Page, "vencimentoModal");
+                return;
+            }
             try
             {
                 // Validação centralizada para vencimento (edição)
@@ -117,6 +123,11 @@ namespace ESIGWeb.Controls
                 }
                 await CarregarDropdownsAsync();
 
+                if (this.Page is Listagem page)
+                {
+                    await page.RecarregarGridAsync();
+                }
+
                 ScriptUtils.HideModal(Page, "vincularVencModal");
                 WebUtils.SetMensagemGlobal("Vencimento salvo com sucesso!", "sucesso");
                 Response.Redirect("Listagem.aspx", false);
@@ -142,6 +153,11 @@ namespace ESIGWeb.Controls
 
                 await _vencimentoService.ExcluirVencimentoAsync(vid);
                 await CarregarDropdownsAsync();
+
+                if (this.Page is Listagem page)
+                {
+                    await page.RecarregarGridAsync();
+                }
 
                 ScriptUtils.HideModal(Page, "vincularVencModal");
                 WebUtils.SetMensagemGlobal("Vencimento excluído com sucesso!", "sucesso");

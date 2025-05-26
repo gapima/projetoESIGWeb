@@ -211,7 +211,7 @@
         DataKeyNames="pessoa_id"
         EmptyDataText="Nenhum registro encontrado.">
         <Columns>
-          <asp:BoundField DataField="pessoa_id" HeaderText="ID" />
+          <asp:BoundField DataField="pessoa_id" HeaderText="ID" Visible="false" />
           <asp:BoundField DataField="nome" HeaderText="Nome" />
           <asp:BoundField DataField="salario_bruto" HeaderText="Salário Bruto" DataFormatString="{0:C}" />
           <asp:BoundField DataField="descontos" HeaderText="Descontos" DataFormatString="{0:C}" />

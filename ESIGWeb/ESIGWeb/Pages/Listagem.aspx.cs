@@ -38,11 +38,12 @@ namespace ESIGWeb
                 loading.Style["display"] = "none";
             }
             RowModal1.PessoaSalvaSucesso += RowModal1_PessoaSalvaSucesso;
+            VincularVencimentosModal2.PessoaSalvaSucesso += RowModal1_PessoaSalvaSucesso;
         }
 
         public async Task RecarregarGridAsync()
         {
-            await CarregarDadosAsync(ViewState["FiltroNome"]?.ToString() ?? "", ViewState["FiltroCargo"]?.ToString() ?? "");
+            await _listagemService.ExecutarProcedureCalculoAsync();
         }
 
         private async void RowModal1_PessoaSalvaSucesso(object sender, EventArgs e)

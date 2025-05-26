@@ -96,6 +96,15 @@ namespace ESIGWeb.Controls
         protected global::System.Web.UI.WebControls.TextBox txtUsuario;
 
         /// <summary>
+        /// Controle reqUsuario.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator reqUsuario;
+
+        /// <summary>
         /// Controle txtCEP.
         /// </summary>
         /// <remarks>
@@ -132,6 +141,15 @@ namespace ESIGWeb.Controls
         protected global::System.Web.UI.WebControls.TextBox txtCidade;
 
         /// <summary>
+        /// Controle reqCidade.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator reqCidade;
+
+        /// <summary>
         /// Controle txtEndereco.
         /// </summary>
         /// <remarks>
@@ -139,6 +157,15 @@ namespace ESIGWeb.Controls
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtEndereco;
+
+        /// <summary>
+        /// Controle reqEndereco.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator reqEndereco;
 
         /// <summary>
         /// Controle txtPais.
@@ -150,6 +177,15 @@ namespace ESIGWeb.Controls
         protected global::System.Web.UI.WebControls.TextBox txtPais;
 
         /// <summary>
+        /// Controle reqPais.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator reqPais;
+
+        /// <summary>
         /// Controle txtTelefone.
         /// </summary>
         /// <remarks>
@@ -159,6 +195,15 @@ namespace ESIGWeb.Controls
         protected global::System.Web.UI.WebControls.TextBox txtTelefone;
 
         /// <summary>
+        /// Controle reqTelefone.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator reqTelefone;
+
+        /// <summary>
         /// Controle ddlCargo.
         /// </summary>
         /// <remarks>
@@ -166,6 +211,15 @@ namespace ESIGWeb.Controls
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlCargo;
+
+        /// <summary>
+        /// Controle reqCargo.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator reqCargo;
 
         /// <summary>
         /// Controle gridCreditos.
