@@ -1039,6 +1039,7 @@
     </Compile>
     <Compile Include="Repository\ListagemRepository.cs" />
     <Compile Include="Repository\PessoaRepository.cs" />
+    <Compile Include="Repository\RelatorioRepository.cs" />
     <Compile Include="Repository\UsuarioRepository.cs" />
     <Compile Include="Repository\VenciemntoRepository.cs" />
     <Compile Include="Services\ListagemService.cs" />

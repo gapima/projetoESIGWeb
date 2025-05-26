@@ -1,5 +1,5 @@
-﻿using ESIGWeb.Data;
-using ESIGWeb.Models;
+﻿using ESIGWeb.Models;
+using ESIGWeb.Repository;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -8,49 +8,51 @@ namespace ESIGWeb.Services
 {
     public class VencimentoService
     {
+        private readonly VencimentoRepository _repo = new VencimentoRepository();
+
         public async Task<DataTable> ObterTodosVencimentosAsync()
         {
-            return await DatabaseHelper.ObterTodosVencimentosAsync();
+            return await _repo.ObterTodosVencimentosAsync();
         }
 
         public async Task<Vencimentos> ObterVencimentoPorIdAsync(int id)
         {
-            return await DatabaseHelper.ObterVencimentoPorIdAsync(id);
+            return await _repo.ObterVencimentoPorIdAsync(id);
         }
 
         public async Task AtualizarVencimentoAsync(Vencimentos v)
         {
-            await DatabaseHelper.AtualizarVencimentoAsync(v);
+            await _repo.AtualizarVencimentoAsync(v);
         }
 
         public async Task InserirVencimentoAsync(Vencimentos v)
         {
-            await DatabaseHelper.InserirVencimentoAsync(v);
+            await _repo.InserirVencimentoAsync(v);
         }
 
         public async Task ExcluirVencimentoAsync(int id)
         {
-            await DatabaseHelper.ExcluirVencimentoAsync(id);
+            await _repo.ExcluirVencimentoAsync(id);
         }
 
         public async Task<List<CargoVencimento>> ObterCargosVinculadosAsync(int vencimentoId)
         {
-            return await DatabaseHelper.ObterCargosVinculadosAsync(vencimentoId);
+            return await _repo.ObterCargosVinculadosAsync(vencimentoId);
         }
 
         public async Task VincularCargoAsync(int vencimentoId, int cargoId)
         {
-            await DatabaseHelper.VincularCargoAsync(vencimentoId, cargoId);
+            await _repo.VincularCargoAsync(vencimentoId, cargoId);
         }
 
         public async Task DesvincularCargoAsync(int vencimentoId, int cargoId)
         {
-            await DatabaseHelper.DesvincularCargoAsync(vencimentoId, cargoId);
+            await _repo.DesvincularCargoAsync(vencimentoId, cargoId);
         }
 
         public async Task<DataTable> ObterTodosCargosAsync()
         {
-            return await DatabaseHelper.ObterTodosCargosAsync();
+            return await _repo.ObterTodosCargosAsync();
         }
     }
 }
