@@ -1,10 +1,12 @@
-﻿using System;
+﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
+using ESIGWeb.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using CrystalDecisions.CrystalReports.Engine;
 
 namespace ESIGWeb.Pages
 {
@@ -14,16 +16,29 @@ namespace ESIGWeb.Pages
         {
             if (!IsPostBack)
             {
-                ReportDocument rpt = new ReportDocument();
-                string reportPath = Server.MapPath("~/RelatorioSalarioCalc.rpt"); // coloque o nome do seu .rpt aqui!
-                rpt.Load(reportPath);
+                // Carrega os dados da view para um DataTable
+                var dt = DatabaseHelper.GetViewData();
 
-                // Se for necessário, defina novamente a conexão do banco aqui (pode ser automático pelo próprio .rpt)
-                // rpt.SetDatabaseLogon(usuario, senha, servidor, banco);
+                // Instancia o ReportDocument e carrega o .rpt
+                ReportDocument rptDoc = new ReportDocument();
+                rptDoc.Load(Server.MapPath("~/RelatorioSalarioCalc.rpt"));
 
-                CrystalReportViewer1.ReportSource = rpt;
+                // Alimenta o report com o DataTable (o passo ESSENCIAL)
+                rptDoc.SetDataSource(dt);
+
+                // Passa para o Viewer
+                CrystalReportViewer1.ReportSource = rptDoc;
                 CrystalReportViewer1.DataBind();
+
+                // (Opcional) Salva na sessão para paginação
+                Session["RptDoc"] = rptDoc;
+            }
+            else
+            {
+                // Em postback, usa o rptDoc da sessão (obrigatório para evitar o problema ao paginar)
+                CrystalReportViewer1.ReportSource = Session["RptDoc"];
             }
         }
+
     }
 }

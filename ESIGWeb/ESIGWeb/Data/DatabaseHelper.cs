@@ -529,6 +529,24 @@ namespace ESIGWeb.Data
                 cmd.ExecuteNonQuery();
             }
         }
+        public static DataTable GetViewData()
+        {
+            using (var conn = new OracleConnection(ConnectionString))
+            {
+                string query = "SELECT * FROM VW_RELATORIO_SALARIOS";
+                using (var cmd = new OracleCommand(query, conn))
+                {
+                    conn.Open();
+                    DataTable dt = new DataTable();
+                    using (var da = new OracleDataAdapter(cmd))
+                    {
+                        da.Fill(dt);
+                    }
+                    return dt;
+                }
+            }
+        }
+
 
         //delete
         public static void ExcluirPessoa(int id)
@@ -545,6 +563,7 @@ namespace ESIGWeb.Data
                 cmd.ExecuteNonQuery();
             }
         }
+
 
 
 

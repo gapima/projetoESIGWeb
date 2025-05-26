@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head runat="server">
-    <title>Relatório de Salarios</title>
+    <title>Relatório de Salários</title>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -13,7 +13,6 @@
             AutoDataBind="true"
             Width="100%" Height="800px" 
             ToolPanelView="None" />
-
     </form>
 </body>
 </html>
