@@ -1,17 +1,17 @@
 ﻿using System;
-using ESIGWeb.Repository;
+using ESIGWeb.Services;
 
 namespace ESIGWeb.Pages
 {
     public partial class Login : System.Web.UI.Page
     {
+        private readonly UsuarioService _usuarioService = new UsuarioService();
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Se já está logado, vai pra listagem (NÃO precisa async aqui)
             if (Session["UsuarioLogado"] != null)
             {
                 Response.Redirect("/Pages/Listagem.aspx");
-                // NÃO precisa do CompleteRequest aqui
                 return;
             }
         }
@@ -19,23 +19,38 @@ namespace ESIGWeb.Pages
         protected async void btnLogin_Click(object sender, EventArgs e)
         {
             lblMensagem.Text = "";
-            btnLogin.Enabled = false; // desativa o botão ao entrar
+            btnLogin.Enabled = false;
 
             string login = txtLogin.Text.Trim();
             string senha = txtSenha.Text.Trim();
 
-            var repo = new UsuarioRepository();
-            var usuario = await repo.ObterPorLoginSenhaAsync(login, senha);
-
-            if (usuario != null)
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(senha))
             {
-                Session["UsuarioLogado"] = usuario;
-                Response.Redirect("/Pages/Listagem.aspx", false); // false evita ThreadAbortException, mas não obrigatório no Click
-                Context.ApplicationInstance.CompleteRequest(); // opcional, mas pode deixar se quiser
+                lblMensagem.Text = "Preencha todos os campos!";
+                btnLogin.Enabled = true;
+                return;
             }
-            else
+
+            try
             {
-                lblMensagem.Text = "Usuário ou senha inválidos!";
+                var usuario = await _usuarioService.AutenticarAsync(login, senha);
+
+                if (usuario != null)
+                {
+                    Session["UsuarioLogado"] = usuario;
+                    ESIGWeb.Utils.WebUtils.SetMensagemGlobal($"Bem-vindo, {usuario.Nome}!", "sucesso");
+                    Response.Redirect("/Pages/Listagem.aspx", false);
+                    Context.ApplicationInstance.CompleteRequest();
+                }
+                else
+                {
+                    lblMensagem.Text = "Usuário ou senha inválidos!";
+                    btnLogin.Enabled = true;
+                }
+            }
+            catch (Exception)
+            {
+                lblMensagem.Text = "Erro ao tentar logar. Tente novamente.";
                 btnLogin.Enabled = true;
             }
         }

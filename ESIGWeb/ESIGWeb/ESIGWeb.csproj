@@ -1043,6 +1043,7 @@
     <Compile Include="Repository\VenciemntoRepository.cs" />
     <Compile Include="Services\ListagemService.cs" />
     <Compile Include="Services\PessoaService.cs" />
+    <Compile Include="Services\UsuarioService.cs" />
     <Compile Include="Services\VencimentoService.cs" />
     <Compile Include="Utils\ConversionUtils.cs" />
     <Compile Include="Utils\LimparCampoUtil.cs" />
