@@ -76,18 +76,12 @@ namespace ESIGWeb.Controls
 
         protected async void btnSalvarVinc_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid)
-            {
-                ScriptUtils.ShowModal(Page, "vencimentoModal");
-                return;
-            }
             try
             {
-                // Validação centralizada para vencimento (edição)
                 List<string> erros;
                 var venc = ValidationUtils.TryParseVencimento(
                     id: ddlVencimentos.SelectedValue,
-                    descricao: null, // Não edita descrição aqui, então pode ser null
+                    descricao: null, 
                     valor: txtValor.Text,
                     formaIncidencia: ddlForma.SelectedValue,
                     tipo: ddlTipo.SelectedValue,
@@ -174,7 +168,6 @@ namespace ESIGWeb.Controls
         {
             try
             {
-                // Validação centralizada para novo vencimento
                 List<string> erros;
                 var venc = ValidationUtils.TryParseVencimento(
                     id: null,
@@ -195,7 +188,6 @@ namespace ESIGWeb.Controls
                 await _vencimentoService.InserirVencimentoAsync(venc);
                 await CarregarDropdownsAsync();
 
-                // Troca de modal com JS custom
                 string script = $@"
                     bootstrap.Modal.getInstance(document.getElementById('{novoVencModal.ClientID}')).hide();
                     setTimeout(function(){{

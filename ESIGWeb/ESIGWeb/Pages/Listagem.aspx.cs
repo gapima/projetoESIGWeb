@@ -1,9 +1,7 @@
-﻿using ESIGWeb.Controls;
-using ESIGWeb.Models;
+﻿using ESIGWeb.Models;
 using ESIGWeb.Services;
 using ESIGWeb.Utils;
 using System;
-using System.Data;
 using System.Threading.Tasks;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -52,7 +50,6 @@ namespace ESIGWeb
                 ViewState["FiltroNome"]?.ToString() ?? "",
                 ViewState["FiltroCargo"]?.ToString() ?? ""
             );
-            // Se quiser, pode mostrar um toast aqui, mas a mensagem global já deve aparecer.
         }
         private async Task CarregarDadosAsync(string filtroNome = "", string filtroCargo = "")
         {
@@ -93,7 +90,6 @@ namespace ESIGWeb
 
         protected async void btnAddPessoa_Click(object sender, EventArgs e)
         {
-            // Preenche cargos no dropdown da modal
             var ddlCargo = RowModal1.FindControl("ddlCargo") as DropDownList;
             if (ddlCargo != null)
             {
@@ -104,7 +100,6 @@ namespace ESIGWeb
                 ddlCargo.DataBind();
             }
 
-            // Preenche grids de créditos e débitos padrão (cargo 1)
             var gridCreditos = RowModal1.FindControl("gridCreditos") as GridView;
             var creditos = await _listagemService.ObterDadosFinanceiroPessoaAsync(1, "C");
             gridCreditos.DataSource = creditos;
@@ -115,10 +110,8 @@ namespace ESIGWeb
             gridDebitos.DataSource = debitos;
             gridDebitos.DataBind();
 
-            // Limpa todos os campos da modal (utilitário)
             LimparCampoUtil.LimparTodosTextBox(RowModal1);
 
-            // Define PessoaId como 0 (novo)
             var txtPessoaId = RowModal1.FindControl("txtPessoaId") as TextBox;
             if (txtPessoaId != null) txtPessoaId.Text = "0";
 

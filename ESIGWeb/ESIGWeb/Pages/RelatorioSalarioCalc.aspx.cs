@@ -1,6 +1,5 @@
 ﻿using CrystalDecisions.CrystalReports.Engine;
-using CrystalDecisions.Shared;
-using ESIGWeb.Services; // (novo)
+using ESIGWeb.Services;
 using System;
 
 namespace ESIGWeb.Pages
@@ -18,7 +17,6 @@ namespace ESIGWeb.Pages
             }
             if (!IsPostBack)
             {
-                // Consulta via Service
                 var dt = _relatorioService.ObterDadosRelatorio();
 
                 ReportDocument rptDoc = new ReportDocument();
@@ -28,7 +26,7 @@ namespace ESIGWeb.Pages
                 CrystalReportViewer1.ReportSource = rptDoc;
                 CrystalReportViewer1.DataBind();
 
-                Session["RptDoc"] = rptDoc; // manter referência na sessão
+                Session["RptDoc"] = rptDoc;
             }
             else
             {

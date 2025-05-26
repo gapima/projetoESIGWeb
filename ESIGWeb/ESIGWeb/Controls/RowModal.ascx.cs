@@ -70,7 +70,7 @@ namespace ESIGWeb.Controls
         {
             if (!Page.IsValid)
             {
-                ScriptUtils.ShowModal(Page, "rowModal"); // Função JS que reabre o modal
+                ScriptUtils.ShowModal(Page, "rowModal"); 
                 return;
             }
             try
@@ -93,30 +93,25 @@ namespace ESIGWeb.Controls
 
                 if (erros.Count > 0)
                 {
-                    // Monta a mensagem de erro para o usuário (pode ser com <br/> para múltiplos erros)
                     string mensagem = "Erros ao salvar:<br/>" + string.Join("<br/>", erros);
                     WebUtils.SetMensagemGlobal(mensagem, "erro");
-                    ScriptUtils.ShowModal(Page, "rowModal"); // Mantém o modal aberto para correção
+                    ScriptUtils.ShowModal(Page, "rowModal"); 
                     return;
                 }
 
-                // Salva e checa retorno do Service (se exception, vai pro catch)
                 await _pessoaService.SalvarPessoaAsync(pessoa);
                 WebUtils.SetMensagemGlobal("Dados salvos com sucesso!", "sucesso");
 
-                // Atualiza grid na página principal, se for chamado de lá
                 if (this.Page is Listagem page)
                 {
                     await page.RecarregarGridAsync();
                 }
 
-                // Dispara evento de sucesso para outros listeners
                 PessoaSalvaSucesso?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
                 WebUtils.SetMensagemGlobal("Erro ao salvar dados: " + ex.Message, "erro");
-                // Evita redirect para manter a experiência, apenas exibe a mensagem:
                 ScriptUtils.ShowModal(Page, "rowModal");
             }
         }

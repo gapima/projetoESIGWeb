@@ -1,15 +1,12 @@
 ﻿using ESIGWeb.Models;
-using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Web.UI;
 
 namespace ESIGWeb.Utils
 {
     public static class ValidationUtils
     {
-        // Exemplo: retorna lista de erros, se houver, ao tentar criar objeto Pessoa.
         public static Pessoa TryParsePessoa(
             string id, string nome, string dataNascimento, string email, string usuario,
             string cidade, string cep, string endereco, string pais, string telefone, string cargoId,
@@ -32,7 +29,6 @@ namespace ESIGWeb.Utils
             if (cargo == 0)
                 erros.Add("Cargo deve ser selecionado.");
 
-            // ... você pode adicionar outras validações conforme precisar
 
             if (erros.Count > 0)
                 return null;

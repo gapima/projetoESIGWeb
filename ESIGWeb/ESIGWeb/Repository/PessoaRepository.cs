@@ -51,7 +51,6 @@ namespace ESIGWeb.Repository
                         CargoNome = rdr.GetString(rdr.GetOrdinal("CargoNome"))
                     };
 
-                    // Busca créditos e débitos
                     pessoa.Creditos = await ObterDadosFinanceiroPessoaAsync(pessoa.CargoId, "C");
                     pessoa.Debitos = await ObterDadosFinanceiroPessoaAsync(pessoa.CargoId, "D");
 
@@ -91,7 +90,6 @@ namespace ESIGWeb.Repository
         using (var cmd = new OracleCommand(sqlUpdate, conn))
         {
             cmd.CommandType = CommandType.Text;
-            // ... (parâmetros igual ao seu código)
             cmd.Parameters.Add("nome", OracleDbType.Varchar2).Value = p.Nome;
             cmd.Parameters.Add("dataNascimento", OracleDbType.Date).Value = p.DataNascimento;
             cmd.Parameters.Add("email", OracleDbType.Varchar2).Value = p.Email;
