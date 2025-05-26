@@ -191,6 +191,9 @@
           <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 1 .908-.417A4 4 0 1 0 8 4V1.5a.5.5 0 0 1 1 0v3A.5.5 0 0 1 8.5 5H5.5a.5.5 0 0 1 0-1H8z"/>
         </svg>
       </button>
+    <div id="loading" runat="server" style="display:none;text-align:center;margin-top:2rem;">
+        <span>Carregando dados...</span>
+    </div>
       <asp:GridView
         ID="gridPessoas"
         runat="server"

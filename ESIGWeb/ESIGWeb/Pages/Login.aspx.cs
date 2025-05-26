@@ -1,6 +1,5 @@
 ﻿using System;
-using ESIGWeb.Models; // ajuste o namespace se for diferente
-using ESIGWeb.Repository; // onde está seu UsuarioRepository
+using ESIGWeb.Repository;
 
 namespace ESIGWeb.Pages
 {
@@ -8,29 +7,37 @@ namespace ESIGWeb.Pages
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Se já está logado, redireciona para Listagem
+            // Se já está logado, vai pra listagem (NÃO precisa async aqui)
             if (Session["UsuarioLogado"] != null)
-                Response.Redirect("Listagem.aspx"); // ou "Pages/Listagem.aspx"
+            {
+                Response.Redirect("/Pages/Listagem.aspx");
+                // NÃO precisa do CompleteRequest aqui
+                return;
+            }
         }
 
-        protected void btnLogin_Click(object sender, EventArgs e)
+        protected async void btnLogin_Click(object sender, EventArgs e)
         {
+            lblMensagem.Text = "";
+            btnLogin.Enabled = false; // desativa o botão ao entrar
+
             string login = txtLogin.Text.Trim();
             string senha = txtSenha.Text.Trim();
 
             var repo = new UsuarioRepository();
-            var usuario = repo.ObterPorLoginSenha(login, senha); // método novo
+            var usuario = await repo.ObterPorLoginSenhaAsync(login, senha);
 
             if (usuario != null)
             {
                 Session["UsuarioLogado"] = usuario;
-                Response.Redirect("Listagem.aspx");
+                Response.Redirect("/Pages/Listagem.aspx", false); // false evita ThreadAbortException, mas não obrigatório no Click
+                Context.ApplicationInstance.CompleteRequest(); // opcional, mas pode deixar se quiser
             }
             else
             {
                 lblMensagem.Text = "Usuário ou senha inválidos!";
+                btnLogin.Enabled = true;
             }
         }
-
     }
 }

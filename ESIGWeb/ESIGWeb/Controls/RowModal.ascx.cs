@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using ESIGWeb.Data;
 using ESIGWeb.Models;
 using Microsoft.Ajax.Utilities;
@@ -10,66 +8,46 @@ namespace ESIGWeb.Controls
 {
     public partial class RowModal : UserControl, IPostBackEventHandler
     {
-        // 1) Certifique-se de que estes IDs batem com o seu RowModal.ascx:
-        //    txtPessoaId, txtPessoaNome, txtDataNascimento, txtEmail, txtUsuario,
-        //    txtCidade, txtCEP, txtEndereco, txtPais, txtTelefone, ddlCargo
-
         protected override void OnInit(EventArgs e)
         {
-            // Importante chamar o base para manter o ciclo de vida
             base.OnInit(e);
-
-            // Se houvesse controles criados dinamicamente, aqui seria o lugar
-            // para recriá-los antes do LoadViewState.
         }
-
-        /// <summary>
-        /// Este método é disparado pelo __doPostBack no cliente,
-        /// com o argumento contendo o pessoaId.
-        /// </summary>
-        public void RaisePostBackEvent(string eventArgument)
+        public async void RaisePostBackEvent(string eventArgument)
         {
-            // 2) Extrai o ID da pessoa
             if (!int.TryParse(eventArgument, out var pessoaId))
                 return;
 
-            // 3) Carrega do banco
-            var p = DatabaseHelper.ObterPessoa(pessoaId);
+            var p = await DatabaseHelper.ObterPessoaAsync(pessoaId);
             if (p == null)
                 return;
 
-            // 4) Preenche campos de Pessoa
             txtPessoaId.Text = p.Id.ToString();
             txtPessoaNome.Text = p.Nome;
             txtDataNascimento.Text = p.DataNascimento.ToString("yyyy-MM-dd");
             txtEmail.Text = p.Email;
             txtUsuario.Text = p.Usuario;
 
-            // 5) Preenche campos de Endereço & Contato
             txtCidade.Text = p.Cidade;
             txtCEP.Text = p.CEP;
-            txtCEP.Attributes["data-initial-cep"] = p.CEP;  // marca valor original
+            txtCEP.Attributes["data-initial-cep"] = p.CEP;
             txtEndereco.Text = p.Endereco;
             txtPais.Text = p.Pais;
             txtTelefone.Text = p.Telefone;
 
-            // 6) Popula o DropDownList de Cargos
-            var dt = DatabaseHelper.ObterTodosCargos();
+            var dt = await DatabaseHelper.ObterTodosCargosAsync();
             ddlCargo.DataSource = dt;
             ddlCargo.DataValueField = "id";
             ddlCargo.DataTextField = "nome";
             ddlCargo.DataBind();
-            // Seleciona o cargo atual da pessoa
             if (ddlCargo.Items.FindByValue(p.CargoId.ToString()) != null)
                 ddlCargo.SelectedValue = p.CargoId.ToString();
-            //dados financeiro
+
             gridCreditos.DataSource = p.Creditos;
             gridCreditos.DataBind();
 
             gridDebitos.DataSource = p.Debitos;
             gridDebitos.DataBind();
 
-            // 7) Enfileira o script para abrir a modal já populada
             Page.ClientScript.RegisterStartupScript(
                 GetType(),
                 "showRowModal",
@@ -77,23 +55,20 @@ namespace ESIGWeb.Controls
                 true
             );
         }
-
-        protected void ddlCargo_SelectedIndexChanged(object sender, EventArgs e)
+        protected async void ddlCargo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // obtém o cargo selecionado
             if (int.TryParse(ddlCargo.SelectedValue, out var novoCargoId))
             {
-                // rebinding da parte financeira
-                var creditos = DatabaseHelper.ObterDadosFinanceiroPessoa(novoCargoId, "C");
+                var creditos = await DatabaseHelper.ObterDadosFinanceiroPessoaAsync(novoCargoId, "C");
                 gridCreditos.DataSource = creditos;
                 gridCreditos.DataBind();
 
-                var debitos = DatabaseHelper.ObterDadosFinanceiroPessoa(novoCargoId, "D");
+                var debitos = await DatabaseHelper.ObterDadosFinanceiroPessoaAsync(novoCargoId, "D");
                 gridDebitos.DataSource = debitos;
                 gridDebitos.DataBind();
             }
 
-            updRowModalBody.Update(); // Atualiza só o conteúdo!
+            updRowModalBody.Update();
             ScriptManager.RegisterStartupScript(
                 this,
                 GetType(),
@@ -102,13 +77,10 @@ namespace ESIGWeb.Controls
                 true
             );
         }
-
-        protected void btnSavePessoa_Click(object sender, EventArgs e)
+        protected async void btnSavePessoa_Click(object sender, EventArgs e)
         {
             try
             {
-
-                // 1) Reconstrói o objeto Pessoa a partir dos campos
                 var p = new Pessoa
                 {
                     Id = !txtPessoaId.Text.IsNullOrWhiteSpace() ? int.Parse(txtPessoaId.Text) : 0,
@@ -124,16 +96,13 @@ namespace ESIGWeb.Controls
                     CargoId = int.Parse(ddlCargo.SelectedValue)
                 };
 
-                // 2) Decide INSERT ou UPDATE
                 if (p.Id == 0)
                 {
-                    // novo registro
-                    p.Id = DatabaseHelper.InserirPessoa(p);
+                    await DatabaseHelper.InserirPessoaAsync(p);
                 }
                 else
                 {
-                    // edição
-                    DatabaseHelper.SalvarPessoa(p);
+                    await DatabaseHelper.SalvarPessoaAsync(p);
                 }
                 Session["MensagemGlobal"] = "Dados salvo com sucesso!";
                 Session["MensagemGlobalTipo"] = "sucesso";
@@ -141,28 +110,20 @@ namespace ESIGWeb.Controls
             }
             catch (Exception ex)
             {
-
                 Session["MensagemGlobal"] = "Erro ao salvar dados: " + ex.Message;
                 Session["MensagemGlobalTipo"] = "erro";
                 Response.Redirect("Listagem.aspx", false);
             }
-
-           
         }
-
-
-        protected void btnDeletePessoa_Click(object sender, EventArgs e)
+        protected async void btnDeletePessoa_Click(object sender, EventArgs e)
         {
             try
             {
-
                 if (!int.TryParse(txtPessoaId.Text, out var pessoaId))
                     return;
 
-                // 1) Exclui do banco
-                DatabaseHelper.ExcluirPessoa(pessoaId);
+                await DatabaseHelper.ExcluirPessoaAsync(pessoaId);
 
-                // 2) Fecha a modal e dispara btnCalcular na página pai
                 var btnCalc = Page.FindControl("btnCalcular") as System.Web.UI.WebControls.Button;
                 string postbackRef = btnCalc != null
                     ? Page.ClientScript.GetPostBackEventReference(btnCalc, "")
@@ -187,13 +148,10 @@ namespace ESIGWeb.Controls
             }
             catch (Exception ex)
             {
-
                 Session["MensagemGlobal"] = "Erro ao excluir pessoa: " + ex.Message;
                 Session["MensagemGlobalTipo"] = "erro";
                 Response.Redirect("Listagem.aspx", false);
             }
         }
-
-
     }
 }

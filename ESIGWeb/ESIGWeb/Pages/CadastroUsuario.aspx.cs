@@ -10,23 +10,20 @@ namespace ESIGWeb.Pages
         {
             if (Session["UsuarioLogado"] != null)
             {
-                // Já está logado, volta para a página principal
                 Response.Redirect("Listagem.aspx");
                 return;
             }
         }
-        protected void btnCadastrar_Click(object sender, EventArgs e)
+        protected async void btnCadastrar_Click(object sender, EventArgs e)
         {
             string login = txtLogin.Text.Trim();
             string nome = txtNome.Text.Trim();
             string email = txtEmail.Text.Trim();
             string senha = txtSenha.Text.Trim();
 
-
-
             var repo = new UsuarioRepository();
 
-            if (repo.UsuarioExiste(login, email))
+            if (await repo.UsuarioExisteAsync(login, email))
             {
                 lblMensagem.Text = "Login ou e-mail já cadastrado!";
                 return;
@@ -34,20 +31,16 @@ namespace ESIGWeb.Pages
 
             var usuario = new Usuario { Login = login, Nome = nome, Email = email, Senha = senha };
 
-            bool sucesso = repo.InserirUsuario(usuario);
+            bool sucesso = await repo.InserirUsuarioAsync(usuario);
 
             if (sucesso)
             {
-                // Mensagem de sucesso (opcional)
-                // lblMensagem.Text = "Usuário cadastrado com sucesso!";
-                // Redireciona para login:
                 Response.Redirect("Login.aspx");
             }
             else
             {
                 lblMensagem.Text = "Erro ao cadastrar usuário.";
             }
-
         }
     }
 }

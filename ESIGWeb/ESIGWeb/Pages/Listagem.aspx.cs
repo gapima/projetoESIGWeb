@@ -1,5 +1,4 @@
-﻿using ESIGWeb.Controls;
-using ESIGWeb.Data;
+﻿using ESIGWeb.Data;
 using ESIGWeb.Models;
 using System;
 using System.Collections.Generic;
@@ -12,42 +11,42 @@ namespace ESIGWeb
 {
     public partial class Listagem : Page
     {
-        protected void Page_Load(object sender, EventArgs e)
+        protected async void Page_Load(object sender, EventArgs e)
         {
-
             if (Session["UsuarioLogado"] == null)
             {
-                Response.Redirect("Login.aspx");
+                Response.Redirect("Login.aspx", false);
+                Context.ApplicationInstance.CompleteRequest();
                 return;
             }
             if (!IsPostBack)
             {
                 var usuario = (Usuario)Session["UsuarioLogado"];
-                lblUsuarioLogado.Text = $"Olá, {usuario.Login}!"; // Ou usuario.Nome, se preferir
+                lblUsuarioLogado.Text = $"Olá, {usuario.Login}!";
 
                 if (Session["MensagemGlobal"] != null)
                 {
-                    // Cria o JS para mostrar o toast com a mensagem
                     string msg = Session["MensagemGlobal"].ToString().Replace("'", "\\'");
                     string script = $@"
-                <script>
-                  document.addEventListener('DOMContentLoaded', function() {{
-                    showGlobalToast('{msg}');
-                  }});
-                </script>";
+                    <script>
+                      document.addEventListener('DOMContentLoaded', function() {{
+                        showGlobalToast('{msg}');
+                      }});
+                    </script>";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "msgGlobal", script, false);
-                    // Limpa a sessão para não repetir a mensagem
                     Session["MensagemGlobal"] = null;
                 }
-                CarregarDados();
+
+                loading.Style["display"] = "block";
+                await CarregarDadosAsync();
+                loading.Style["display"] = "none";
             }
         }
 
-        private void CarregarDados(string filtroNome = "", string filtroCargo = "")
+        private async Task CarregarDadosAsync(string filtroNome = "", string filtroCargo = "")
         {
-            var dt = DatabaseHelper.ObterPessoasSalarios();
+            var dt = await DatabaseHelper.ObterPessoasSalariosAsync();
 
-            // Cria DataView para filtrar sem alterar o DataTable original
             DataView dv = dt.DefaultView;
 
             List<string> filtros = new List<string>();
@@ -63,14 +62,15 @@ namespace ESIGWeb
             gridPessoas.DataBind();
         }
 
-
-        protected void gridPessoas_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        protected async void gridPessoas_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             gridPessoas.PageIndex = e.NewPageIndex;
-            // Pegue filtros do ViewState, senão fica vazio
             string filtroNome = ViewState["FiltroNome"]?.ToString() ?? "";
             string filtroCargo = ViewState["FiltroCargo"]?.ToString() ?? "";
-            CarregarDados(filtroNome, filtroCargo);
+
+            loading.Style["display"] = "block";
+            await CarregarDadosAsync(filtroNome, filtroCargo);
+            loading.Style["display"] = "none";
         }
 
         protected void gridPessoas_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -87,8 +87,10 @@ namespace ESIGWeb
 
         protected async void btnCalcular_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>DatabaseHelper.ExecutarProcedureCalculoAsync());
-            CarregarDados();
+            loading.Style["display"] = "block";
+            await DatabaseHelper.ExecutarProcedureCalculoAsync();
+            await CarregarDadosAsync();
+            loading.Style["display"] = "none";
         }
 
         void LimparCampo(Control parent, string id)
@@ -96,64 +98,43 @@ namespace ESIGWeb
             var txt = parent.FindControl(id) as TextBox;
             if (txt != null) txt.Text = "";
         }
-        protected void btnAddPessoa_Click(object sender, EventArgs e)
+
+        protected async void btnAddPessoa_Click(object sender, EventArgs e)
         {
-            // 1) Popula o dropdown de cargos dentro do RowModal
             var ddlCargo = RowModal1.FindControl("ddlCargo") as DropDownList;
             if (ddlCargo != null)
             {
-                var dt = DatabaseHelper.ObterTodosCargos();
+                var dt = await DatabaseHelper.ObterTodosCargosAsync();
                 ddlCargo.DataSource = dt;
                 ddlCargo.DataValueField = "id";
                 ddlCargo.DataTextField = "nome";
                 ddlCargo.DataBind();
             }
             var gridCreditos = RowModal1.FindControl("gridCreditos") as GridView;
-            var creditos = DatabaseHelper.ObterDadosFinanceiroPessoa(1, "C");
+            var creditos = await DatabaseHelper.ObterDadosFinanceiroPessoaAsync(1, "C");
             gridCreditos.DataSource = creditos;
             gridCreditos.DataBind();
 
             var gridDebitos = RowModal1.FindControl("gridDebitos") as GridView;
-            var debitos = DatabaseHelper.ObterDadosFinanceiroPessoa(1, "D");
+            var debitos = await DatabaseHelper.ObterDadosFinanceiroPessoaAsync(1, "D");
             gridDebitos.DataSource = debitos;
             gridDebitos.DataBind();
+
+            LimparCampo(RowModal1, "txtPessoaId");
+            LimparCampo(RowModal1, "txtPessoaNome");
+            LimparCampo(RowModal1, "txtDataNascimento");
+            LimparCampo(RowModal1, "txtEmail");
+            LimparCampo(RowModal1, "txtUsuario");
+            LimparCampo(RowModal1, "txtCidade");
+            LimparCampo(RowModal1, "txtCEP");
+            LimparCampo(RowModal1, "txtEndereco");
+            LimparCampo(RowModal1, "txtPais");
+            LimparCampo(RowModal1, "txtTelefone");
 
             var txtPessoaId = RowModal1.FindControl("txtPessoaId") as TextBox;
             if (txtPessoaId != null) txtPessoaId.Text = "0";
 
-            var txtPessoaNome = RowModal1.FindControl("txtPessoaNome") as TextBox;
-            if (txtPessoaNome != null) txtPessoaNome.Text = "";
-
-            var txtDataNascimento = RowModal1.FindControl("txtDataNascimento") as TextBox;
-            if (txtDataNascimento != null) txtDataNascimento.Text = "";
-
-            var txtEmail = RowModal1.FindControl("txtEmail") as TextBox;
-            if (txtEmail != null) txtEmail.Text = "";
-
-            var txtUsuario = RowModal1.FindControl("txtUsuario") as TextBox;
-            if (txtUsuario != null) txtUsuario.Text = "";
-
-            var txtCidade = RowModal1.FindControl("txtCidade") as TextBox;
-            if (txtCidade != null) txtCidade.Text = "";
-
-            var txtCEP = RowModal1.FindControl("txtCEP") as TextBox;
-            if (txtCEP != null) txtCEP.Text = "";
-
-            var txtEndereco = RowModal1.FindControl("txtEndereco") as TextBox;
-            if (txtEndereco != null) txtEndereco.Text = "";
-
-            var txtPais = RowModal1.FindControl("txtPais") as TextBox;
-            if (txtPais != null) txtPais.Text = "";
-
-            var txtTelefone = RowModal1.FindControl("txtTelefone") as TextBox;
-            if (txtTelefone != null) txtTelefone.Text = "";
-
-            LimparCampo(RowModal1, "txtPessoaId");
-            LimparCampo(RowModal1, "txtPessoaNome");
-
-            // 3) Registra script para limpar e abrir a modal
             string script = "new bootstrap.Modal(document.getElementById('rowModal')).show();";
-
             ScriptManager.RegisterStartupScript(
                 this,
                 GetType(),
@@ -165,9 +146,8 @@ namespace ESIGWeb
 
         protected void btnVincularVencimentos_Click(object sender, EventArgs e)
         {
-            // abre a modal principal de vinculação
             LimparCampo(VincularVencimentosModal2, "txtValor");
-            VincularVencimentosModal2.CarregarDropdowns();
+            VincularVencimentosModal2.CarregarDropdownsAsync(); // Deixe esse método async se o seu DataHelper for async!
             ScriptManager.RegisterStartupScript(
                 this, GetType(),
                 "showVincular",
@@ -179,26 +159,33 @@ namespace ESIGWeb
         {
             Response.Redirect("RelatorioSalarioCalc.aspx");
         }
-        protected void btnFiltrar_Click(object sender, EventArgs e)
+
+        protected async void btnFiltrar_Click(object sender, EventArgs e)
         {
             ViewState["FiltroNome"] = txtFiltroNome.Text.Trim();
             ViewState["FiltroCargo"] = txtFiltroCargo.Text.Trim();
-            CarregarDados(ViewState["FiltroNome"]?.ToString(), ViewState["FiltroCargo"]?.ToString());
+
+            loading.Style["display"] = "block";
+            await CarregarDadosAsync(ViewState["FiltroNome"]?.ToString(), ViewState["FiltroCargo"]?.ToString());
+            loading.Style["display"] = "none";
         }
-        protected void btnLimparFiltro_Click(object sender, EventArgs e)
+
+        protected async void btnLimparFiltro_Click(object sender, EventArgs e)
         {
             txtFiltroNome.Text = "";
             txtFiltroCargo.Text = "";
             ViewState["FiltroNome"] = null;
             ViewState["FiltroCargo"] = null;
-            CarregarDados();
+
+            loading.Style["display"] = "block";
+            await CarregarDadosAsync();
+            loading.Style["display"] = "none";
         }
+
         protected void btnLogout_Click(object sender, EventArgs e)
         {
             Session.Abandon();
             Response.Redirect("Login.aspx");
         }
-
-
     }
 }

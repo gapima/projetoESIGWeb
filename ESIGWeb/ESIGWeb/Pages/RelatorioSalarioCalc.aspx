@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RelatorioSalarioCalc.aspx.cs" Inherits="ESIGWeb.Pages.RelatorioSalarioCalc" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RelatorioSalarioCalc.aspx.cs" Inherits="ESIGWeb.Pages.RelatorioSalarioCalc" Async="true"%>
 <%@ Register Assembly="CrystalDecisions.Web" Namespace="CrystalDecisions.Web" TagPrefix="cr" %>
 <!DOCTYPE html>
 <html>

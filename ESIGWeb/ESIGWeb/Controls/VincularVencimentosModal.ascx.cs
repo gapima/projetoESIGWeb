@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -15,57 +16,50 @@ namespace ESIGWeb.Controls
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
-                CarregarDropdowns();
+                CarregarDropdownsAsync();
         }
-
-        public void CarregarDropdowns()
+        public async Task CarregarDropdownsAsync()
         {
-            // popula vencimentos
-            ddlVencimentos.DataSource = DatabaseHelper.ObterTodosVencimentos();
+            ddlVencimentos.DataSource = await DatabaseHelper.ObterTodosVencimentosAsync();
             ddlVencimentos.DataTextField = "Descricao";
             ddlVencimentos.DataValueField = "Id";
             ddlVencimentos.DataBind();
             ddlVencimentos.Items.Insert(0, new ListItem("-- selecione --", ""));
 
-            // popula lista de cargos (marcados ou não)
-            PreencherCargos();
+            await PreencherCargosAsync();
         }
-
-        protected void ddlVencimentos_SelectedIndexChanged(object sender, EventArgs e)
+        protected async void ddlVencimentos_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (int.TryParse(ddlVencimentos.SelectedValue, out var vid))
             {
-                var v = DatabaseHelper.ObterVencimento(vid);
+                var v = await DatabaseHelper.ObterVencimentoPorIdAsync(vid);
                 txtValor.Text = v.Valor.ToString("F2");
                 ddlForma.SelectedValue = v.FormaIncidencia;
                 ddlTipo.SelectedValue = v.Tipo;
             }
-            PreencherCargos();
-            // reabre a modal após postback
+            await PreencherCargosAsync();
             ScriptManager.RegisterStartupScript(
                 this, GetType(),
                 "showVincular",
                 "new bootstrap.Modal(document.getElementById('vincularVencModal')).show();",
                 true);
         }
-
-        private void PreencherCargos()
+        private async Task PreencherCargosAsync()
         {
-            // obtém todos os cargos do banco
-            var todosDt = DatabaseHelper.ObterTodosCargos();
+            var todosDt = await DatabaseHelper.ObterTodosCargosAsync();
             var todasRows = todosDt.Rows.Cast<DataRow>();
 
-            // prepara o conjunto de IDs já vinculados (se houver um vencimento selecionado)
             var vinculados = new HashSet<int>();
             if (int.TryParse(ddlVencimentos.SelectedValue, out var vid))
             {
-                foreach (var cv in DatabaseHelper.ObterCargosVinculados(vid))
+                var cargosVinc = await DatabaseHelper.ObterCargosVinculadosAsync(vid);
+                foreach (var cv in cargosVinc)
                     vinculados.Add(cv.CargoId);
             }
 
-            // transforma cada DataRow num objeto anônimo com Id, Nome e Vinculado
             var lista = todasRows
-                .Select(r => new {
+                .Select(r => new
+                {
                     Id = Convert.ToInt32(r["id"]),
                     Nome = r["nome"].ToString(),
                     Vinculado = vinculados.Contains(Convert.ToInt32(r["id"]))
@@ -75,15 +69,13 @@ namespace ESIGWeb.Controls
             rptCargos.DataSource = lista;
             rptCargos.DataBind();
         }
-
-        protected void btnSalvarVinc_Click(object sender, EventArgs e)
+        protected async void btnSalvarVinc_Click(object sender, EventArgs e)
         {
             try
             {
                 if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
                     return;
 
-                // lê quais checkboxes foram marcados (name="chkCargo" no repeater)
                 var valores = Request.Form.GetValues("chkCargo");
                 var selecionados = new HashSet<int>();
                 if (valores != null)
@@ -100,25 +92,22 @@ namespace ESIGWeb.Controls
                     FormaIncidencia = ddlForma.SelectedValue,
                     Tipo = ddlTipo.SelectedValue
                 };
-                DatabaseHelper.AtualizarVencimento(v);
+                await DatabaseHelper.AtualizarVencimentoAsync(v);
 
-                // pega todos os cargos de novo
-                var todosDt = DatabaseHelper.ObterTodosCargos();
+                var todosDt = await DatabaseHelper.ObterTodosCargosAsync();
                 var todosIds = todosDt.Rows
                     .Cast<DataRow>()
                     .Select(r => Convert.ToInt32(r["id"]));
 
-                // para cada cargo, vincula ou desvincula
                 foreach (var cid in todosIds)
                 {
                     if (selecionados.Contains(cid))
-                        DatabaseHelper.VincularCargo(vid, cid);
+                        await DatabaseHelper.VincularCargoAsync(vid, cid);
                     else
-                        DatabaseHelper.DesvincularCargo(vid, cid);
+                        await DatabaseHelper.DesvincularCargoAsync(vid, cid);
                 }
-                CarregarDropdowns();
+                await CarregarDropdownsAsync();
 
-                // fecha modal
                 ScriptManager.RegisterStartupScript(
                     this, GetType(), "closeVinc",
                     "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
@@ -134,22 +123,20 @@ namespace ESIGWeb.Controls
                 Response.Redirect("Listagem.aspx", false);
             }
         }
-
-        protected void btnExcluirVinc_Click(object sender, EventArgs e)
+        protected async void btnExcluirVinc_Click(object sender, EventArgs e)
         {
             try
             {
                 if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
                     return;
 
-                // desfaz todos os vínculos
-                foreach (var cv in DatabaseHelper.ObterCargosVinculados(vid))
-                    DatabaseHelper.DesvincularCargo(vid, cv.CargoId);
+                var cargosVinc = await DatabaseHelper.ObterCargosVinculadosAsync(vid);
+                foreach (var cv in cargosVinc)
+                    await DatabaseHelper.DesvincularCargoAsync(vid, cv.CargoId);
 
-                DatabaseHelper.ExcluirVencimento(vid);
-                CarregarDropdowns();
+                await DatabaseHelper.ExcluirVencimentoAsync(vid);
+                await CarregarDropdownsAsync();
 
-                // fecha modal
                 ScriptManager.RegisterStartupScript(
                     this, GetType(), "closeVinc",
                     "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
@@ -166,12 +153,10 @@ namespace ESIGWeb.Controls
                 Response.Redirect("Listagem.aspx", false);
             }
         }
-
-        protected void btnSalvarNovo_Click(object sender, EventArgs e)
+        protected async void btnSalvarNovo_Click(object sender, EventArgs e)
         {
             try
             {
-                // 1) Persista o novo vencimento
                 var v = new Vencimentos
                 {
                     Descricao = txtDescNovo.Text.Trim(),
@@ -179,10 +164,9 @@ namespace ESIGWeb.Controls
                     FormaIncidencia = ddlFormaNovo.SelectedValue,
                     Tipo = ddlTipoNovo.SelectedValue
                 };
-                DatabaseHelper.InserirVencimento(v);
-                CarregarDropdowns();
+                await DatabaseHelper.InserirVencimentoAsync(v);
+                await CarregarDropdownsAsync();
 
-                // 2) Fecha filho e reabre pai
                 var script = $@"
                   bootstrap.Modal.getInstance(
                     document.getElementById('{novoVencModal.ClientID}')
@@ -207,6 +191,5 @@ namespace ESIGWeb.Controls
                 Response.Redirect("Listagem.aspx", false);
             }
         }
-
     }
 }

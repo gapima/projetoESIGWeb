@@ -2,11 +2,6 @@
 using CrystalDecisions.Shared;
 using ESIGWeb.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace ESIGWeb.Pages
 {
@@ -14,31 +9,35 @@ namespace ESIGWeb.Pages
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["UsuarioLogado"] == null)
+            {
+                Response.Redirect("Login.aspx");
+                return;
+            }
             if (!IsPostBack)
             {
-                // Carrega os dados da view para um DataTable
-                var dt = DatabaseHelper.GetViewData();
+                // Preferencialmente, use a versão síncrona
+                var dt = DatabaseHelper.GetViewData(); // <-- se existir
 
-                // Instancia o ReportDocument e carrega o .rpt
+                // Se só existir a async, use .Result (apenas para testes locais)
+                // var dt = DatabaseHelper.GetViewDataAsync().Result;
+
                 ReportDocument rptDoc = new ReportDocument();
                 rptDoc.Load(Server.MapPath("~/RelatorioSalarioCalc.rpt"));
 
-                // Alimenta o report com o DataTable (o passo ESSENCIAL)
                 rptDoc.SetDataSource(dt);
 
-                // Passa para o Viewer
                 CrystalReportViewer1.ReportSource = rptDoc;
                 CrystalReportViewer1.DataBind();
 
-                // (Opcional) Salva na sessão para paginação
                 Session["RptDoc"] = rptDoc;
             }
             else
             {
-                // Em postback, usa o rptDoc da sessão (obrigatório para evitar o problema ao paginar)
                 CrystalReportViewer1.ReportSource = Session["RptDoc"];
             }
         }
+
 
     }
 }
