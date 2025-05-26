@@ -6,11 +6,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
   <title>Listagem de Pessoas e Salários</title>
-
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/853ca98770.js" crossorigin="anonymous"></script>
 
   <style>
     body {
@@ -71,30 +69,39 @@
     .table {
       margin-bottom: 0;
     }
-    /* Ícone de atualizar VERDE */
-    .refresh-btn {
-      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-      border-radius: 50%;
-      border: 2px solid #38b54a;
-      padding: 6px 8px 5px 8px;
-      background: #fff;
-      color: #38b54a;
+    .refresh-btn-modern {
       position: absolute;
-      right: 20px;
-      top: 14px;
-      z-index: 10;
-      transition: background 0.15s, color 0.15s, border 0.15s;
+      top: 12px;
+      right: 18px;
+      z-index: 15;
+      background: #38b54a;
+      border: none;
+      outline: none;
+      border-radius: 50%;
+      padding: 7px;
+      box-shadow: 0 3px 14px rgba(56,181,74,0.13);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.18s;
+      cursor: pointer;
+      height: 38px;
+      width: 38px;
     }
-    .refresh-btn svg {
-      color: #38b54a;
-      fill: #38b54a;
-      stroke: #38b54a;
-      vertical-align: middle;
+    .refresh-btn-modern:hover,
+    .refresh-btn-modern:focus {
+      background: #249d34;
+      transform: rotate(180deg) scale(1.07);
     }
-    .refresh-btn:hover {
-      background: #e7fbe7;
-      color: #249d34;
-      border-color: #249d34;
+    .refresh-btn-modern svg {
+      width: 23px;
+      height: 23px;
+      stroke: #fff;
+      fill: none;
+      transition: stroke 0.19s;
+    }
+    .refresh-btn-modern:active svg {
+      stroke: #d4f5df;
     }
     .action-buttons-row {
       margin-top: 0.7rem;
@@ -180,20 +187,22 @@
       <asp:Button ID="btnLimparFiltro" runat="server" Text="Limpar" CssClass="btn btn-outline-secondary" OnClick="btnLimparFiltro_Click" />
     </div>
 
-    <!-- Grid moderna com botão de atualização no canto superior direito -->
-    <div class="table-responsive">
+    <div class="d-flex justify-content-end mb-2" style="position:relative;">
       <button type="button"
-              class="btn refresh-btn"
-              data-bs-toggle="tooltip"
+              id="btnRefreshGrid"
+              class="btn btn-success rounded-circle shadow-sm"
+              style="width:44px;height:44px;display:flex;align-items:center;justify-content:center; font-size:1.3rem;"
               title="Atualizar salários"
+              aria-label="Atualizar salários"
               onclick="__doPostBack('<%= btnCalcular.UniqueID %>', '')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 1 .908-.417A4 4 0 1 0 8 4V1.5a.5.5 0 0 1 1 0v3A.5.5 0 0 1 8.5 5H5.5a.5.5 0 0 1 0-1H8z"/>
-        </svg>
+        <i class="fa-solid fa-arrows-rotate"></i>
       </button>
-    <div id="loading" runat="server" style="display:none;text-align:center;margin-top:2rem;">
-        <span>Carregando dados...</span>
     </div>
+
+    <div class="table-responsive">
+      <div id="loading" runat="server" style="display:none;text-align:center;margin-top:2rem;">
+          <span>Carregando dados...</span>
+      </div>
       <asp:GridView
         ID="gridPessoas"
         runat="server"
@@ -215,7 +224,6 @@
         </Columns>
       </asp:GridView>
     </div>
-
     <!-- Botões de ação (agora invertidos) -->
     <div class="action-buttons-row">
       <div class="action-buttons-left">
@@ -272,42 +280,39 @@
 <!-- Script de validação de CEP -->
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        // Captura o botão OK e os inputs do RowModal
         var btnOk = document.getElementById('<%= RowModal1.FindControl("btnValidateCep").ClientID %>');
         var txtCep = document.getElementById('<%= RowModal1.FindControl("txtCEP").ClientID %>');
         var txtEndereco = document.getElementById('<%= RowModal1.FindControl("txtEndereco").ClientID %>');
         var txtCidade = document.getElementById('<%= RowModal1.FindControl("txtCidade").ClientID %>');
-
-      // Handler de clique
-      btnOk.addEventListener('click', function (e) {
-          e.preventDefault();  // evita qualquer postback
-          var cep = txtCep.value.replace(/\D/g, '');
-          if (cep.length !== 8) {
-              alert('O CEP deve ter exatamente 8 dígitos.');
-              return;
-          }
-          txtEndereco.value = 'Buscando…';
-          txtCidade.value = '';
-          fetch('https://brasilapi.com.br/api/cep/v1/' + cep)
-              .then(function (resp) {
-                  if (!resp.ok) throw resp;
-                  return resp.json();
-              })
-              .then(function (data) {
-                  txtCidade.value = data.city || '';
-                  var parts = [];
-                  if (data.street) parts.push(data.street);
-                  if (data.neighborhood) parts.push(data.neighborhood);
-                  if (data.state) parts.push(data.state);
-                  txtEndereco.value = parts.join(', ');
-              })
-              .catch(function () {
-                  alert('CEP inválido ou não encontrado.');
-                  txtEndereco.value = '';
-                  txtCidade.value = '';
-              });
-      });
-  });
+        btnOk.addEventListener('click', function (e) {
+            e.preventDefault();
+            var cep = txtCep.value.replace(/\D/g, '');
+            if (cep.length !== 8) {
+                alert('O CEP deve ter exatamente 8 dígitos.');
+                return;
+            }
+            txtEndereco.value = 'Buscando…';
+            txtCidade.value = '';
+            fetch('https://brasilapi.com.br/api/cep/v1/' + cep)
+                .then(function (resp) {
+                    if (!resp.ok) throw resp;
+                    return resp.json();
+                })
+                .then(function (data) {
+                    txtCidade.value = data.city || '';
+                    var parts = [];
+                    if (data.street) parts.push(data.street);
+                    if (data.neighborhood) parts.push(data.neighborhood);
+                    if (data.state) parts.push(data.state);
+                    txtEndereco.value = parts.join(', ');
+                })
+                .catch(function () {
+                    alert('CEP inválido ou não encontrado.');
+                    txtEndereco.value = '';
+                    txtCidade.value = '';
+                });
+        });
+    });
 </script>
 
 <script type="text/javascript">
