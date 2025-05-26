@@ -78,96 +78,134 @@ namespace ESIGWeb.Controls
 
         protected void btnSalvarVinc_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
-                return;
-
-            // lê quais checkboxes foram marcados (name="chkCargo" no repeater)
-            var valores = Request.Form.GetValues("chkCargo");
-            var selecionados = new HashSet<int>();
-            if (valores != null)
+            try
             {
-                foreach (var s in valores)
-                    if (int.TryParse(s, out var i))
-                        selecionados.Add(i);
+                if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
+                    return;
+
+                // lê quais checkboxes foram marcados (name="chkCargo" no repeater)
+                var valores = Request.Form.GetValues("chkCargo");
+                var selecionados = new HashSet<int>();
+                if (valores != null)
+                {
+                    foreach (var s in valores)
+                        if (int.TryParse(s, out var i))
+                            selecionados.Add(i);
+                }
+
+                var v = new Vencimentos
+                {
+                    Id = vid,
+                    Valor = decimal.Parse(txtValor.Text),
+                    FormaIncidencia = ddlForma.SelectedValue,
+                    Tipo = ddlTipo.SelectedValue
+                };
+                DatabaseHelper.AtualizarVencimento(v);
+
+                // pega todos os cargos de novo
+                var todosDt = DatabaseHelper.ObterTodosCargos();
+                var todosIds = todosDt.Rows
+                    .Cast<DataRow>()
+                    .Select(r => Convert.ToInt32(r["id"]));
+
+                // para cada cargo, vincula ou desvincula
+                foreach (var cid in todosIds)
+                {
+                    if (selecionados.Contains(cid))
+                        DatabaseHelper.VincularCargo(vid, cid);
+                    else
+                        DatabaseHelper.DesvincularCargo(vid, cid);
+                }
+                CarregarDropdowns();
+
+                // fecha modal
+                ScriptManager.RegisterStartupScript(
+                    this, GetType(), "closeVinc",
+                    "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
+                    true);
+                Session["MensagemGlobal"] = "Vencimento salvo com sucesso!";
+                Session["MensagemGlobalTipo"] = "sucesso";
+                Response.Redirect("Listagem.aspx", false);
             }
-
-            var v = new Vencimentos
+            catch (Exception ex)
             {
-                Id = vid,
-                Valor = decimal.Parse(txtValor.Text),
-                FormaIncidencia = ddlForma.SelectedValue,
-                Tipo = ddlTipo.SelectedValue
-            };
-            DatabaseHelper.AtualizarVencimento(v);
-
-            // pega todos os cargos de novo
-            var todosDt = DatabaseHelper.ObterTodosCargos();
-            var todosIds = todosDt.Rows
-                .Cast<DataRow>()
-                .Select(r => Convert.ToInt32(r["id"]));
-
-            // para cada cargo, vincula ou desvincula
-            foreach (var cid in todosIds)
-            {
-                if (selecionados.Contains(cid))
-                    DatabaseHelper.VincularCargo(vid, cid);
-                else
-                    DatabaseHelper.DesvincularCargo(vid, cid);
+                Session["MensagemGlobal"] = "Erro ao salvar vencimento: " + ex.Message;
+                Session["MensagemGlobalTipo"] = "erro";
+                Response.Redirect("Listagem.aspx", false);
             }
-            CarregarDropdowns();
-
-            // fecha modal
-            ScriptManager.RegisterStartupScript(
-                this, GetType(), "closeVinc",
-                "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
-                true);
         }
 
         protected void btnExcluirVinc_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
-                return;
+            try
+            {
+                if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
+                    return;
 
-            // desfaz todos os vínculos
-            foreach (var cv in DatabaseHelper.ObterCargosVinculados(vid))
-                DatabaseHelper.DesvincularCargo(vid, cv.CargoId);
+                // desfaz todos os vínculos
+                foreach (var cv in DatabaseHelper.ObterCargosVinculados(vid))
+                    DatabaseHelper.DesvincularCargo(vid, cv.CargoId);
 
-            DatabaseHelper.ExcluirVencimento(vid);
-            CarregarDropdowns();
+                DatabaseHelper.ExcluirVencimento(vid);
+                CarregarDropdowns();
 
-            // fecha modal
-            ScriptManager.RegisterStartupScript(
-                this, GetType(), "closeVinc",
-                "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
-                true);
+                // fecha modal
+                ScriptManager.RegisterStartupScript(
+                    this, GetType(), "closeVinc",
+                    "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
+                    true);
+
+                Session["MensagemGlobal"] = "Vencimento excluído com sucesso!";
+                Session["MensagemGlobalTipo"] = "sucesso";
+                Response.Redirect("Listagem.aspx", false);
+            }
+            catch (Exception ex)
+            {
+                Session["MensagemGlobal"] = "Erro ao excluir vencimento: " + ex.Message;
+                Session["MensagemGlobalTipo"] = "erro";
+                Response.Redirect("Listagem.aspx", false);
+            }
         }
 
         protected void btnSalvarNovo_Click(object sender, EventArgs e)
         {
-            // 1) Persista o novo vencimento
-            var v = new Vencimentos
+            try
             {
-                Descricao = txtDescNovo.Text.Trim(),
-                Valor = decimal.Parse(txtValorNovo.Text),
-                FormaIncidencia = ddlFormaNovo.SelectedValue,
-                Tipo = ddlTipoNovo.SelectedValue
-            };
-            DatabaseHelper.InserirVencimento(v);
-            CarregarDropdowns();
+                // 1) Persista o novo vencimento
+                var v = new Vencimentos
+                {
+                    Descricao = txtDescNovo.Text.Trim(),
+                    Valor = decimal.Parse(txtValorNovo.Text),
+                    FormaIncidencia = ddlFormaNovo.SelectedValue,
+                    Tipo = ddlTipoNovo.SelectedValue
+                };
+                DatabaseHelper.InserirVencimento(v);
+                CarregarDropdowns();
 
-            // 2) Fecha filho e reabre pai
-            var script = $@"
-              bootstrap.Modal.getInstance(
-                document.getElementById('{novoVencModal.ClientID}')
-              ).hide();
+                // 2) Fecha filho e reabre pai
+                var script = $@"
+                  bootstrap.Modal.getInstance(
+                    document.getElementById('{novoVencModal.ClientID}')
+                  ).hide();
 
-              setTimeout(function(){{
-                new bootstrap.Modal(
-                  document.getElementById('{vincularVencModal.ClientID}')
-                ).show();
-              }}, 200);
-            ";
-            ScriptManager.RegisterStartupScript(this, GetType(), "afterNovoVenc", script, true);
+                  setTimeout(function(){{
+                    new bootstrap.Modal(
+                      document.getElementById('{vincularVencModal.ClientID}')
+                    ).show();
+                  }}, 200);
+                ";
+                ScriptManager.RegisterStartupScript(this, GetType(), "afterNovoVenc", script, true);
+
+                Session["MensagemGlobal"] = "Novo vencimento salvo com sucesso!";
+                Session["MensagemGlobalTipo"] = "sucesso";
+                Response.Redirect("Listagem.aspx", false);
+            }
+            catch (Exception ex)
+            {
+                Session["MensagemGlobal"] = "Erro ao salvar novo vencimento: " + ex.Message;
+                Session["MensagemGlobalTipo"] = "erro";
+                Response.Redirect("Listagem.aspx", false);
+            }
         }
 
     }

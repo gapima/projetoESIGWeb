@@ -27,6 +27,19 @@
 </head>
 <body>
   <form id="form1" runat="server" class="container mt-4">
+          <!-- Toast de mensagem global -->
+    <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 60px;">
+      <div id="globalToast" class="toast align-items-center text-bg-success border-0"
+           role="alert" aria-live="assertive" aria-atomic="true"
+           style="position: absolute; top: 10px; right: 10px; min-width: 250px; z-index: 9999; display:none;">
+        <div class="d-flex">
+          <div class="toast-body" id="globalToastMsg">Sucesso!</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                  data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+
     <asp:ScriptManager runat="server" />
 
     <h2>Listagem de Pessoas e Salários</h2>
@@ -154,6 +167,21 @@
     }
 </script>--%>
 
+<script type="text/javascript">
+    function showGlobalToast(msg, success = true) {
+        var toast = document.getElementById("globalToast");
+        var toastMsg = document.getElementById("globalToastMsg");
+        if (!toast || !toastMsg) return;
+        toastMsg.innerText = msg;
+        toast.classList.remove("text-bg-success", "text-bg-danger");
+        toast.classList.add(success ? "text-bg-success" : "text-bg-danger");
+        toast.style.display = "block";
+        var bsToast = bootstrap.Toast.getOrCreateInstance(toast, { delay: 3500 });
+        bsToast.show();
+        // Esconde depois
+        setTimeout(() => { toast.style.display = "none"; }, 3700);
+    }
+</script>
 
 
 

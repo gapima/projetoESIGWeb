@@ -13,7 +13,23 @@ namespace ESIGWeb
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
+            {
+                if (Session["MensagemGlobal"] != null)
+                {
+                    // Cria o JS para mostrar o toast com a mensagem
+                    string msg = Session["MensagemGlobal"].ToString().Replace("'", "\\'");
+                    string script = $@"
+                <script>
+                  document.addEventListener('DOMContentLoaded', function() {{
+                    showGlobalToast('{msg}');
+                  }});
+                </script>";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "msgGlobal", script, false);
+                    // Limpa a sessão para não repetir a mensagem
+                    Session["MensagemGlobal"] = null;
+                }
                 CarregarDados();
+            }
         }
 
         private void CarregarDados()

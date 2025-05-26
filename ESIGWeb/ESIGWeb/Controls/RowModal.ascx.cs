@@ -105,32 +105,46 @@ namespace ESIGWeb.Controls
 
         protected void btnSavePessoa_Click(object sender, EventArgs e)
         {
-            // 1) Reconstrói o objeto Pessoa a partir dos campos
-            var p = new Pessoa
+            try
             {
-                Id = !txtPessoaId.Text.IsNullOrWhiteSpace() ? int.Parse(txtPessoaId.Text) : 0,
-                Nome = txtPessoaNome.Text,
-                DataNascimento = DateTime.Parse(txtDataNascimento.Text),
-                Email = txtEmail.Text,
-                Usuario = txtUsuario.Text,
-                Cidade = txtCidade.Text,
-                CEP = txtCEP.Text,
-                Endereco = txtEndereco.Text,
-                Pais = txtPais.Text,
-                Telefone = txtTelefone.Text,
-                CargoId = int.Parse(ddlCargo.SelectedValue)
-            };
 
-            // 2) Decide INSERT ou UPDATE
-            if (p.Id == 0)
-            {
-                // novo registro
-                p.Id = DatabaseHelper.InserirPessoa(p);
+                // 1) Reconstrói o objeto Pessoa a partir dos campos
+                var p = new Pessoa
+                {
+                    Id = !txtPessoaId.Text.IsNullOrWhiteSpace() ? int.Parse(txtPessoaId.Text) : 0,
+                    Nome = txtPessoaNome.Text,
+                    DataNascimento = DateTime.Parse(txtDataNascimento.Text),
+                    Email = txtEmail.Text,
+                    Usuario = txtUsuario.Text,
+                    Cidade = txtCidade.Text,
+                    CEP = txtCEP.Text,
+                    Endereco = txtEndereco.Text,
+                    Pais = txtPais.Text,
+                    Telefone = txtTelefone.Text,
+                    CargoId = int.Parse(ddlCargo.SelectedValue)
+                };
+
+                // 2) Decide INSERT ou UPDATE
+                if (p.Id == 0)
+                {
+                    // novo registro
+                    p.Id = DatabaseHelper.InserirPessoa(p);
+                }
+                else
+                {
+                    // edição
+                    DatabaseHelper.SalvarPessoa(p);
+                }
+                Session["MensagemGlobal"] = "Dados salvo com sucesso!";
+                Session["MensagemGlobalTipo"] = "sucesso";
+                Response.Redirect("Listagem.aspx", false);
             }
-            else
+            catch (Exception ex)
             {
-                // edição
-                DatabaseHelper.SalvarPessoa(p);
+
+                Session["MensagemGlobal"] = "Erro ao salvar dados: " + ex.Message;
+                Session["MensagemGlobalTipo"] = "erro";
+                Response.Redirect("Listagem.aspx", false);
             }
 
            
@@ -139,31 +153,45 @@ namespace ESIGWeb.Controls
 
         protected void btnDeletePessoa_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(txtPessoaId.Text, out var pessoaId))
-                return;
+            try
+            {
 
-            // 1) Exclui do banco
-            DatabaseHelper.ExcluirPessoa(pessoaId);
+                if (!int.TryParse(txtPessoaId.Text, out var pessoaId))
+                    return;
 
-            // 2) Fecha a modal e dispara btnCalcular na página pai
-            var btnCalc = Page.FindControl("btnCalcular") as System.Web.UI.WebControls.Button;
-            string postbackRef = btnCalc != null
-                ? Page.ClientScript.GetPostBackEventReference(btnCalc, "")
-                : "__doPostBack('','')";
+                // 1) Exclui do banco
+                DatabaseHelper.ExcluirPessoa(pessoaId);
 
-            string script = $@"
-              var m = bootstrap.Modal.getInstance(document.getElementById('rowModal'));
-              if(m) m.hide();
-              {postbackRef};
-            ";
+                // 2) Fecha a modal e dispara btnCalcular na página pai
+                var btnCalc = Page.FindControl("btnCalcular") as System.Web.UI.WebControls.Button;
+                string postbackRef = btnCalc != null
+                    ? Page.ClientScript.GetPostBackEventReference(btnCalc, "")
+                    : "__doPostBack('','')";
 
-            ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                "deletePessoa",
-                script,
-                true
-            );
+                string script = $@"
+                  var m = bootstrap.Modal.getInstance(document.getElementById('rowModal'));
+                  if(m) m.hide();
+                  {postbackRef};
+                ";
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "deletePessoa",
+                    script,
+                    true
+                );
+                Session["MensagemGlobal"] = "Pessoa excluida com sucesso!";
+                Session["MensagemGlobalTipo"] = "sucesso";
+                Response.Redirect("Listagem.aspx", false);
+            }
+            catch (Exception ex)
+            {
+
+                Session["MensagemGlobal"] = "Erro ao excluir pessoa: " + ex.Message;
+                Session["MensagemGlobalTipo"] = "erro";
+                Response.Redirect("Listagem.aspx", false);
+            }
         }
 
 

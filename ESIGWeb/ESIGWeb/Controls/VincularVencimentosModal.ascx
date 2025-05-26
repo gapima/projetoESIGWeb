@@ -21,7 +21,6 @@
       <asp:UpdatePanel ID="updVincular" runat="server" UpdateMode="Conditional">
         <ContentTemplate>
           <div class="modal-body">
-
             <!-- Linha: dropdown de vencimentos + botão de “Novo” -->
             <div class="d-flex align-items-center mb-3">
               <label class="me-2 mb-0">Vencimento:</label>
