@@ -1037,11 +1037,15 @@
       <DependentUpon>RelatorioSalarioCalc.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Repository\ListagemRepository.cs" />
     <Compile Include="Repository\PessoaRepository.cs" />
     <Compile Include="Repository\UsuarioRepository.cs" />
+    <Compile Include="Repository\VenciemntoRepository.cs" />
+    <Compile Include="Services\ListagemService.cs" />
     <Compile Include="Services\PessoaService.cs" />
     <Compile Include="Services\VencimentoService.cs" />
     <Compile Include="Utils\ConversionUtils.cs" />
+    <Compile Include="Utils\LimparCampoUtil.cs" />
     <Compile Include="Utils\ScriptUtils.cs" />
     <Compile Include="Utils\UIUtils.cs" />
     <Compile Include="Utils\ValidationUtils.cs" />

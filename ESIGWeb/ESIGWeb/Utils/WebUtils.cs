@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using System.Web.UI;
 
 namespace ESIGWeb.Utils
 {
@@ -8,6 +9,18 @@ namespace ESIGWeb.Utils
         {
             HttpContext.Current.Session["MensagemGlobal"] = mensagem;
             HttpContext.Current.Session["MensagemGlobalTipo"] = tipo;
+        }
+
+        public static void ShowMensagemGlobalScript(Page page, string mensagem)
+        {
+            string msg = mensagem.Replace("'", "\\'");
+            string script = $@"
+                <script>
+                  document.addEventListener('DOMContentLoaded', function() {{
+                    showGlobalToast('{msg}');
+                  }});
+                </script>";
+            ScriptManager.RegisterStartupScript(page, page.GetType(), "msgGlobal", script, false);
         }
     }
 }

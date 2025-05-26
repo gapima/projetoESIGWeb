@@ -16,5 +16,11 @@ namespace ESIGWeb.Utils
         {
             return DateTime.TryParse(value, out var result) ? result : (DateTime?)null;
         }
+
+        public static decimal ToDecimalSafe(string value)
+        {
+            if (decimal.TryParse(value, out decimal d)) return d;
+            return 0;
+        }
     }
 }
