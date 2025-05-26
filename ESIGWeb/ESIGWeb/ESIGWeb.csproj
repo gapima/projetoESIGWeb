@@ -905,7 +905,9 @@
     <Content Include="Controls\VincularVencimentosModal.ascx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Pages\CadastroUsuario.aspx" />
     <Content Include="Pages\Listagem.aspx" />
+    <Content Include="Pages\Login.aspx" />
     <Content Include="Pages\RelatorioSalarioCalc.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -998,13 +1000,28 @@
     </Compile>
     <Compile Include="Models\CargoVencimento.cs" />
     <Compile Include="Models\Pessoa.cs" />
+    <Compile Include="Models\Usuarios.cs" />
     <Compile Include="Models\Vencimentos.cs" />
+    <Compile Include="Pages\CadastroUsuario.aspx.cs">
+      <DependentUpon>CadastroUsuario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\CadastroUsuario.aspx.designer.cs">
+      <DependentUpon>CadastroUsuario.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Listagem.aspx.cs">
       <DependentUpon>Listagem.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Pages\Listagem.aspx.designer.cs">
       <DependentUpon>Listagem.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
     </Compile>
     <Compile Include="Pages\RelatorioSalarioCalc.aspx.cs">
       <DependentUpon>RelatorioSalarioCalc.aspx</DependentUpon>
@@ -1020,6 +1037,7 @@
       <DependentUpon>RelatorioSalarioCalc.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Repository\UsuarioRepository.cs" />
     <Compile Include="ViewSwitcher.ascx.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

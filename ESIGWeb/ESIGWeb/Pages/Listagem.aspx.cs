@@ -1,6 +1,8 @@
 ﻿using ESIGWeb.Controls;
 using ESIGWeb.Data;
+using ESIGWeb.Models;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using System.Web.UI;
@@ -12,8 +14,17 @@ namespace ESIGWeb
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            if (Session["UsuarioLogado"] == null)
+            {
+                Response.Redirect("Login.aspx");
+                return;
+            }
             if (!IsPostBack)
             {
+                var usuario = (Usuario)Session["UsuarioLogado"];
+                lblUsuarioLogado.Text = $"Olá, {usuario.Login}!"; // Ou usuario.Nome, se preferir
+
                 if (Session["MensagemGlobal"] != null)
                 {
                     // Cria o JS para mostrar o toast com a mensagem
@@ -32,17 +43,34 @@ namespace ESIGWeb
             }
         }
 
-        private void CarregarDados()
+        private void CarregarDados(string filtroNome = "", string filtroCargo = "")
         {
             var dt = DatabaseHelper.ObterPessoasSalarios();
-            gridPessoas.DataSource = dt;
+
+            // Cria DataView para filtrar sem alterar o DataTable original
+            DataView dv = dt.DefaultView;
+
+            List<string> filtros = new List<string>();
+            if (!string.IsNullOrWhiteSpace(filtroNome))
+                filtros.Add($"nome LIKE '%{filtroNome.Replace("'", "''")}%'");
+            if (!string.IsNullOrWhiteSpace(filtroCargo))
+                filtros.Add($"nome_cargo LIKE '%{filtroCargo.Replace("'", "''")}%'");
+
+            if (filtros.Count > 0)
+                dv.RowFilter = string.Join(" AND ", filtros);
+
+            gridPessoas.DataSource = dv;
             gridPessoas.DataBind();
         }
+
 
         protected void gridPessoas_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             gridPessoas.PageIndex = e.NewPageIndex;
-            CarregarDados();
+            // Pegue filtros do ViewState, senão fica vazio
+            string filtroNome = ViewState["FiltroNome"]?.ToString() ?? "";
+            string filtroCargo = ViewState["FiltroCargo"]?.ToString() ?? "";
+            CarregarDados(filtroNome, filtroCargo);
         }
 
         protected void gridPessoas_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -151,6 +179,26 @@ namespace ESIGWeb
         {
             Response.Redirect("RelatorioSalarioCalc.aspx");
         }
+        protected void btnFiltrar_Click(object sender, EventArgs e)
+        {
+            ViewState["FiltroNome"] = txtFiltroNome.Text.Trim();
+            ViewState["FiltroCargo"] = txtFiltroCargo.Text.Trim();
+            CarregarDados(ViewState["FiltroNome"]?.ToString(), ViewState["FiltroCargo"]?.ToString());
+        }
+        protected void btnLimparFiltro_Click(object sender, EventArgs e)
+        {
+            txtFiltroNome.Text = "";
+            txtFiltroCargo.Text = "";
+            ViewState["FiltroNome"] = null;
+            ViewState["FiltroCargo"] = null;
+            CarregarDados();
+        }
+        protected void btnLogout_Click(object sender, EventArgs e)
+        {
+            Session.Abandon();
+            Response.Redirect("Login.aspx");
+        }
+
 
     }
 }
