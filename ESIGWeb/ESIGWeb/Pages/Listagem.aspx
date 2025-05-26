@@ -86,6 +86,14 @@
         style="float: right"
         OnClick="btnAddPessoa_Click" />
 
+    <asp:Button 
+        ID="btnGerarRelatorio" 
+        runat="server" 
+        Text="Gerar Relatório"
+        CssClass="btn btn-success mt-3"
+        OnClick="btnGerarRelatorio_Click" />
+
+
 
     <uc:RowModal ID="RowModal1" runat="server" />
     <uc:VincularVencimentosModal ID="VincularVencimentosModal2" runat="server" />

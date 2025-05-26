@@ -146,5 +146,11 @@ namespace ESIGWeb
                 "new bootstrap.Modal(document.getElementById('vincularVencModal')).show();",
                 true);
         }
+
+        protected void btnGerarRelatorio_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("RelatorioSalarioCalc.aspx");
+        }
+
     }
 }
