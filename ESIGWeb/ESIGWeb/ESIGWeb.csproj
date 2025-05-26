@@ -1048,6 +1048,7 @@
     <Compile Include="Services\UsuarioService.cs" />
     <Compile Include="Services\VencimentoService.cs" />
     <Compile Include="Utils\ConversionUtils.cs" />
+    <Compile Include="Utils\GridUtils.cs" />
     <Compile Include="Utils\LimparCampoUtil.cs" />
     <Compile Include="Utils\ScriptUtils.cs" />
     <Compile Include="Utils\UIUtils.cs" />

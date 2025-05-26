@@ -1,5 +1,6 @@
 ﻿using ESIGWeb.Models;
 using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -63,48 +64,51 @@ namespace ESIGWeb.Repository
         {
             if (p.Id == 0)
                 await InserirPessoaAsync(p);
-            else
-                await AtualizarPessoaAsync(p);
-        }
-
-        private async Task AtualizarPessoaAsync(Pessoa p)
-        {
-            const string sqlUpdate = @"
-                UPDATE pessoa
-                   SET nome            = :nome,
-                       data_nascimento = :dataNascimento,
-                       email           = :email,
-                       usuario         = :usuario,
-                       cidade          = :cidade,
-                       cep             = :cep,
-                       endereco        = :endereco,
-                       pais            = :pais,
-                       telefone        = :telefone,
-                       cargo_id        = :cargoId
-                 WHERE id = :id";
-
-            using (var conn = new OracleConnection(ConnectionString))
-            using (var cmd = new OracleCommand(sqlUpdate, conn))
-            {
-                cmd.CommandType = CommandType.Text;
-
-                cmd.Parameters.Add("nome", OracleDbType.Varchar2).Value = p.Nome;
-                cmd.Parameters.Add("dataNascimento", OracleDbType.Date).Value = p.DataNascimento;
-                cmd.Parameters.Add("email", OracleDbType.Varchar2).Value = p.Email;
-                cmd.Parameters.Add("usuario", OracleDbType.Varchar2).Value = p.Usuario;
-                cmd.Parameters.Add("cidade", OracleDbType.Varchar2).Value = p.Cidade;
-                cmd.Parameters.Add("cep", OracleDbType.Varchar2).Value = p.CEP;
-                cmd.Parameters.Add("endereco", OracleDbType.Varchar2).Value = p.Endereco;
-                cmd.Parameters.Add("pais", OracleDbType.Varchar2).Value = p.Pais;
-                cmd.Parameters.Add("telefone", OracleDbType.Varchar2).Value = p.Telefone;
-                cmd.Parameters.Add("cargoId", OracleDbType.Int32).Value = p.CargoId;
-                cmd.Parameters.Add("id", OracleDbType.Int32).Value = p.Id;
-
-                await conn.OpenAsync();
-                await cmd.ExecuteNonQueryAsync();
+            else {
+                int affected = await AtualizarPessoaAsync(p);
+                if (affected == 0)
+                    throw new Exception("Nenhuma linha foi alterada. Verifique o ID!");
             }
         }
 
+    public static async Task<int> AtualizarPessoaAsync(Pessoa p)
+    {
+        const string sqlUpdate = @"
+            UPDATE pessoa
+               SET nome            = :nome,
+                   data_nascimento = :dataNascimento,
+                   email           = :email,
+                   usuario         = :usuario,
+                   cidade          = :cidade,
+                   cep             = :cep,
+                   endereco        = :endereco,
+                   pais            = :pais,
+                   telefone        = :telefone,
+                   cargo_id        = :cargoId
+             WHERE id = :id";
+
+        using (var conn = new OracleConnection(ConnectionString))
+        using (var cmd = new OracleCommand(sqlUpdate, conn))
+        {
+            cmd.CommandType = CommandType.Text;
+            // ... (parâmetros igual ao seu código)
+            cmd.Parameters.Add("nome", OracleDbType.Varchar2).Value = p.Nome;
+            cmd.Parameters.Add("dataNascimento", OracleDbType.Date).Value = p.DataNascimento;
+            cmd.Parameters.Add("email", OracleDbType.Varchar2).Value = p.Email;
+            cmd.Parameters.Add("usuario", OracleDbType.Varchar2).Value = p.Usuario;
+            cmd.Parameters.Add("cidade", OracleDbType.Varchar2).Value = p.Cidade;
+            cmd.Parameters.Add("cep", OracleDbType.Varchar2).Value = p.CEP;
+            cmd.Parameters.Add("endereco", OracleDbType.Varchar2).Value = p.Endereco;
+            cmd.Parameters.Add("pais", OracleDbType.Varchar2).Value = p.Pais;
+            cmd.Parameters.Add("telefone", OracleDbType.Varchar2).Value = p.Telefone;
+            cmd.Parameters.Add("cargoId", OracleDbType.Int32).Value = p.CargoId;
+            cmd.Parameters.Add("id", OracleDbType.Int32).Value = p.Id;
+
+            await conn.OpenAsync();
+            int affected = await cmd.ExecuteNonQueryAsync();
+            return affected;
+        }
+}
         private async Task InserirPessoaAsync(Pessoa p)
         {
             const string sql = @"

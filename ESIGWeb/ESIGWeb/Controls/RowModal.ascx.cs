@@ -10,6 +10,7 @@ namespace ESIGWeb.Controls
     public partial class RowModal : UserControl, IPostBackEventHandler
     {
         private readonly PessoaService _pessoaService = new PessoaService();
+        public event EventHandler PessoaSalvaSucesso;
 
         public async void RaisePostBackEvent(string eventArgument)
         {
@@ -64,45 +65,56 @@ namespace ESIGWeb.Controls
             updRowModalBody.Update();
             ScriptUtils.ShowModal(Page, "rowModal");
         }
-protected async void btnSavePessoa_Click(object sender, EventArgs e)
-{
-    try
-    {
-        List<string> erros;
-        var pessoa = ValidationUtils.TryParsePessoa(
-            txtPessoaId.Text,
-            txtPessoaNome.Text,
-            txtDataNascimento.Text,
-            txtEmail.Text,
-            txtUsuario.Text,
-            txtCidade.Text,
-            txtCEP.Text,
-            txtEndereco.Text,
-            txtPais.Text,
-            txtTelefone.Text,
-            ddlCargo.SelectedValue,
-            out erros
-        );
-
-        if (erros.Count > 0)
+        protected async void btnSavePessoa_Click(object sender, EventArgs e)
         {
-            // Monta a mensagem de erro para o usuário (pode ser com <br/> para múltiplos erros)
-            string mensagem = "Erros ao salvar:<br/>" + string.Join("<br/>", erros);
-            WebUtils.SetMensagemGlobal(mensagem, "erro");
-            ScriptUtils.ShowModal(Page, "rowModal"); // Mantém o modal aberto para correção
-            return;
+            try
+            {
+                List<string> erros;
+                var pessoa = ValidationUtils.TryParsePessoa(
+                    txtPessoaId.Text,
+                    txtPessoaNome.Text,
+                    txtDataNascimento.Text,
+                    txtEmail.Text,
+                    txtUsuario.Text,
+                    txtCidade.Text,
+                    txtCEP.Text,
+                    txtEndereco.Text,
+                    txtPais.Text,
+                    txtTelefone.Text,
+                    ddlCargo.SelectedValue,
+                    out erros
+                );
+
+                if (erros.Count > 0)
+                {
+                    // Monta a mensagem de erro para o usuário (pode ser com <br/> para múltiplos erros)
+                    string mensagem = "Erros ao salvar:<br/>" + string.Join("<br/>", erros);
+                    WebUtils.SetMensagemGlobal(mensagem, "erro");
+                    ScriptUtils.ShowModal(Page, "rowModal"); // Mantém o modal aberto para correção
+                    return;
+                }
+
+                // Salva e checa retorno do Service (se exception, vai pro catch)
+                await _pessoaService.SalvarPessoaAsync(pessoa);
+                WebUtils.SetMensagemGlobal("Dados salvos com sucesso!", "sucesso");
+
+                // Atualiza grid na página principal, se for chamado de lá
+                if (this.Page is Listagem page)
+                {
+                    await page.RecarregarGridAsync();
+                }
+
+                // Dispara evento de sucesso para outros listeners
+                PessoaSalvaSucesso?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                WebUtils.SetMensagemGlobal("Erro ao salvar dados: " + ex.Message, "erro");
+                // Evita redirect para manter a experiência, apenas exibe a mensagem:
+                ScriptUtils.ShowModal(Page, "rowModal");
+            }
         }
 
-        await _pessoaService.SalvarPessoaAsync(pessoa);
-        WebUtils.SetMensagemGlobal("Dados salvo com sucesso!", "sucesso");
-        Response.Redirect("Listagem.aspx", false);
-    }
-    catch (Exception ex)
-    {
-        WebUtils.SetMensagemGlobal("Erro ao salvar dados: " + ex.Message, "erro");
-        Response.Redirect("Listagem.aspx", false);
-    }
-}
 
 
         protected async void btnDeletePessoa_Click(object sender, EventArgs e)
@@ -134,7 +146,7 @@ protected async void btnSavePessoa_Click(object sender, EventArgs e)
                     true
                 );
                 WebUtils.SetMensagemGlobal("Pessoa excluida com sucesso!", "sucesso");
-                Response.Redirect("Listagem.aspx", false);
+                PessoaSalvaSucesso?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {

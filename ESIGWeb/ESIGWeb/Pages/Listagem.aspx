@@ -8,8 +8,7 @@
   <title>Listagem de Pessoas e Salários</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/853ca98770.js" crossorigin="anonymous"></script>
-
+  <script src="https://kit.fontawesome.com/853ca98770.js" crossorigin="anonymous"></script>
   <style>
     body {
       background: #f8fafc;
@@ -149,9 +148,7 @@
   </style>
 </head>
 <body>
-
   <form id="form1" runat="server" class="container mt-2">
-
     <div class="d-flex justify-content-end align-items-center mt-3 mb-2" style="gap: 1rem;">
         <asp:Label ID="lblUsuarioLogado" runat="server" CssClass="fw-bold text-primary" />
         <asp:Button 
@@ -159,7 +156,8 @@
             runat="server" 
             CssClass="btn btn-outline-danger"
             Text="Sair"
-            OnClick="btnLogout_Click" />
+            OnClick="btnLogout_Click"
+            UseSubmitBehavior="false" /> <!-- importante, previne submit por enter! -->
     </div>
     <!-- Toast de mensagem global -->
     <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 60px;">
@@ -173,19 +171,18 @@
         </div>
       </div>
     </div>
-
     <asp:ScriptManager runat="server" />
 
     <!-- Título centralizado -->
     <div class="page-title">Listagem de Pessoas e Salários</div>
 
-    <!-- Filtros modernos centralizados -->
-    <div class="filtros-wrap">
+    <!-- Filtros modernos centralizados (agora com asp:Panel e DefaultButton) -->
+    <asp:Panel ID="pnlFiltros" runat="server" DefaultButton="btnFiltrar" CssClass="filtros-wrap">
       <asp:TextBox ID="txtFiltroNome" runat="server" CssClass="form-control" placeholder="Filtrar por nome" />
       <asp:TextBox ID="txtFiltroCargo" runat="server" CssClass="form-control" placeholder="Filtrar por cargo" />
       <asp:Button ID="btnFiltrar" runat="server" Text="Filtrar" CssClass="btn btn-primary" OnClick="btnFiltrar_Click" />
       <asp:Button ID="btnLimparFiltro" runat="server" Text="Limpar" CssClass="btn btn-outline-secondary" OnClick="btnLimparFiltro_Click" />
-    </div>
+    </asp:Panel>
 
     <div class="d-flex justify-content-end mb-2" style="position:relative;">
       <button type="button"
@@ -198,7 +195,6 @@
         <i class="fa-solid fa-arrows-rotate"></i>
       </button>
     </div>
-
     <div class="table-responsive">
       <div id="loading" runat="server" style="display:none;text-align:center;margin-top:2rem;">
           <span>Carregando dados...</span>
@@ -260,11 +256,11 @@
 
     <uc:RowModal ID="RowModal1" runat="server" />
     <uc:VincularVencimentosModal ID="VincularVencimentosModal2" runat="server" />
-
   </form>
 </body>
 </html>
 
+<!-- ...os scripts seguem iguais... -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Ativa o Tooltip do Bootstrap -->

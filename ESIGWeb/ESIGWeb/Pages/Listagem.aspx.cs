@@ -1,8 +1,8 @@
-﻿using ESIGWeb.Models;
+﻿using ESIGWeb.Controls;
+using ESIGWeb.Models;
 using ESIGWeb.Services;
 using ESIGWeb.Utils;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using System.Web.UI;
@@ -27,7 +27,6 @@ namespace ESIGWeb
                 var usuario = (Usuario)Session["UsuarioLogado"];
                 lblUsuarioLogado.Text = $"Olá, {usuario.Login}!";
 
-                // Utilizando a WebUtils para exibir mensagem global, se houver
                 if (Session["MensagemGlobal"] != null)
                 {
                     WebUtils.ShowMensagemGlobalScript(this, Session["MensagemGlobal"].ToString());
@@ -38,25 +37,26 @@ namespace ESIGWeb
                 await CarregarDadosAsync();
                 loading.Style["display"] = "none";
             }
+            RowModal1.PessoaSalvaSucesso += RowModal1_PessoaSalvaSucesso;
         }
 
+        public async Task RecarregarGridAsync()
+        {
+            await CarregarDadosAsync(ViewState["FiltroNome"]?.ToString() ?? "", ViewState["FiltroCargo"]?.ToString() ?? "");
+        }
+
+        private async void RowModal1_PessoaSalvaSucesso(object sender, EventArgs e)
+        {
+            await CarregarDadosAsync(
+                ViewState["FiltroNome"]?.ToString() ?? "",
+                ViewState["FiltroCargo"]?.ToString() ?? ""
+            );
+            // Se quiser, pode mostrar um toast aqui, mas a mensagem global já deve aparecer.
+        }
         private async Task CarregarDadosAsync(string filtroNome = "", string filtroCargo = "")
         {
             var dt = await _listagemService.ObterPessoasSalariosAsync();
-
-            DataView dv = dt.DefaultView;
-
-            List<string> filtros = new List<string>();
-            if (!string.IsNullOrWhiteSpace(filtroNome))
-                filtros.Add($"nome LIKE '%{filtroNome.Replace("'", "''")}%'");
-            if (!string.IsNullOrWhiteSpace(filtroCargo))
-                filtros.Add($"nome_cargo LIKE '%{filtroCargo.Replace("'", "''")}%'");
-
-            if (filtros.Count > 0)
-                dv.RowFilter = string.Join(" AND ", filtros);
-
-            gridPessoas.DataSource = dv;
-            gridPessoas.DataBind();
+            GridUtils.CarregarGridComFiltro(gridPessoas, dt, filtroNome, filtroCargo);
         }
 
         protected async void gridPessoas_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -127,7 +127,7 @@ namespace ESIGWeb
         protected async void btnVincularVencimentos_Click(object sender, EventArgs e)
         {
             LimparCampoUtil.LimparTextBox(VincularVencimentosModal2, "txtValor");
-           await VincularVencimentosModal2.CarregarDropdownsAsync();
+            await VincularVencimentosModal2.CarregarDropdownsAsync();
             ScriptUtils.ShowModal(this, "vincularVencModal");
         }
 
