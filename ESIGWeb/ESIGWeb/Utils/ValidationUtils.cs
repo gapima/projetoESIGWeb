@@ -1,4 +1,5 @@
 ﻿using ESIGWeb.Models;
+using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -61,8 +62,8 @@ namespace ESIGWeb.Utils
             int vencId = 0;
             if (!string.IsNullOrWhiteSpace(id))
                 vencId = ConversionUtils.ToIntSafe(id);
-
-            if (string.IsNullOrWhiteSpace(descricao))
+            
+            if (vencId <= 0 && string.IsNullOrWhiteSpace(descricao))
                 erros.Add("Descrição é obrigatória.");
 
             decimal valorDec;
@@ -78,6 +79,8 @@ namespace ESIGWeb.Utils
             if (erros.Count > 0)
                 return null;
 
+            if (vencId > 0)
+                descricao = "";
             return new Vencimentos
             {
                 Id = vencId,
