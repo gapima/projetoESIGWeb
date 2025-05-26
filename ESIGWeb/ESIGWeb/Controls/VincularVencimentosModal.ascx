@@ -37,6 +37,9 @@
               </button>
             </div>
 
+            <!-- Bloco de erro para edição -->
+            <div id="erroEditVenc" class="alert alert-danger d-none" role="alert"></div>
+
             <!-- Campos de edição do vencimento selecionado -->
             <div class="row mb-4">
               <div class="col-md-4">
@@ -125,6 +128,9 @@
 
       <!-- Body -->
       <div class="modal-body">
+        <!-- Bloco de erro para novo -->
+        <div id="erroNovoVenc" class="alert alert-danger d-none" role="alert"></div>
+
         <div class="mb-3">
           <label for="txtDescNovo" class="form-label">Descrição</label>
           <asp:TextBox ID="txtDescNovo" runat="server"
@@ -169,25 +175,10 @@
 </div>
 
 <!-- Abre a modal “Novo Vencimento” -->
-<%--<script type="text/javascript">
-  function openNewVencimentoModal() {
-    // esconde a modal pai (caso esteja aberta)
-    var pai = bootstrap.Modal.getInstance(
-      document.getElementById('<%= vincularVencModal.ClientID %>')
-    );
-    if (pai) pai.hide();
-
-    // abre a modal filho
-    var filho = new bootstrap.Modal(
-      document.getElementById('<%= novoVencModal.ClientID %>')
-    );
-        filho.show();
-    }
-</script>--%>
 <script type="text/javascript">
     function openNewVencimentoModal() {
         const modalPaiEl = document.getElementById('<%= vincularVencModal.ClientID %>');
-    const modalFilhoEl = document.getElementById('<%= novoVencModal.ClientID %>');
+        const modalFilhoEl = document.getElementById('<%= novoVencModal.ClientID %>');
 
         const modalPai = bootstrap.Modal.getOrCreateInstance(modalPaiEl);
         const modalFilho = bootstrap.Modal.getOrCreateInstance(modalFilhoEl);
@@ -195,56 +186,90 @@
         // Fecha a modal pai
         modalPai.hide();
 
-        // Remoção completa dos vestígios da modal anterior
         setTimeout(() => {
-            // Garante que backdrop sumiu
             document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
-
-            // Remove classe que prende o scroll
             document.body.classList.remove('modal-open');
-
-            // Remove classe "show" manualmente da modal pai
             modalPaiEl.classList.remove('show');
             modalPaiEl.setAttribute('aria-hidden', 'true');
             modalPaiEl.setAttribute('style', 'display: none;');
-
-
             document.getElementById('<%= txtDescNovo.ClientID %>').value = '';
             document.getElementById('<%= txtValorNovo.ClientID %>').value = '';
             document.getElementById('<%= ddlFormaNovo.ClientID %>').selectedIndex = 0;
             document.getElementById('<%= ddlTipoNovo.ClientID %>').selectedIndex = 0;
-            // Agora abre a nova modal
             modalFilho.show();
-        }, 300); // espera a transição da primeira modal
+        }, 300);
     }
 </script>
 
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function () {
+        // Máscara decimal nos inputs
         document.querySelectorAll(".valor-decimal").forEach(function (input) {
             input.addEventListener("input", function (e) {
-                // Remove tudo que não é número
                 let valor = input.value.replace(/\D/g, '');
-
-                // Se estiver vazio, zera
                 if (valor === '') {
                     input.value = '';
                     return;
                 }
-
-                // Converte para decimal em tempo real (2 casas)
                 let intValue = parseInt(valor);
                 let decimalValue = (intValue / 100).toFixed(2);
-
-                // Formata com vírgula (pt-BR)
                 input.value = decimalValue.replace('.', ',');
             });
-
-            // (Opcional) Seleciona tudo ao focar, para facilitar digitação
             input.addEventListener("focus", function () {
                 setTimeout(() => input.select(), 1);
             });
         });
+
+        // Validação do formulário de NOVO vencimento
+        const btnSalvarNovo = document.getElementById('<%= btnSalvarNovo.ClientID %>');
+        if (btnSalvarNovo) {
+            btnSalvarNovo.onclick = function (e) {
+                const desc = document.getElementById('<%= txtDescNovo.ClientID %>').value.trim();
+                const valor = document.getElementById('<%= txtValorNovo.ClientID %>').value.replace(',', '.').trim();
+                const forma = document.getElementById('<%= ddlFormaNovo.ClientID %>').value;
+                const tipo = document.getElementById('<%= ddlTipoNovo.ClientID %>').value;
+                let erros = [];
+
+                if (!desc) erros.push("Descrição é obrigatória.");
+                if (!valor || isNaN(valor) || Number(valor) < 0) erros.push("Valor deve ser um número positivo.");
+                if (!forma) erros.push("Selecione a forma de incidência.");
+                if (!tipo) erros.push("Selecione o tipo.");
+
+                if (erros.length > 0) {
+                    e.preventDefault();
+                    const erroDiv = document.getElementById('erroNovoVenc');
+                    erroDiv.innerHTML = erros.join("<br>");
+                    erroDiv.classList.remove('d-none');
+                    return false;
+                } else {
+                    document.getElementById('erroNovoVenc').classList.add('d-none');
+                }
+            }
+        }
+
+        // Validação do formulário de EDIÇÃO de vencimento
+        const btnSalvarVinc = document.getElementById('<%= btnSalvarVinc.ClientID %>');
+        if (btnSalvarVinc) {
+            btnSalvarVinc.onclick = function (e) {
+                const valor = document.getElementById('<%= txtValor.ClientID %>').value.replace(',', '.').trim();
+                const forma = document.getElementById('<%= ddlForma.ClientID %>').value;
+                const tipo = document.getElementById('<%= ddlTipo.ClientID %>').value;
+                let erros = [];
+
+                if (!valor || isNaN(valor) || Number(valor) < 0) erros.push("Valor deve ser um número positivo.");
+                if (!forma) erros.push("Selecione a forma de incidência.");
+                if (!tipo) erros.push("Selecione o tipo.");
+
+                if (erros.length > 0) {
+                    e.preventDefault();
+                    const erroDiv = document.getElementById('erroEditVenc');
+                    erroDiv.innerHTML = erros.join("<br>");
+                    erroDiv.classList.remove('d-none');
+                    return false;
+                } else {
+                    document.getElementById('erroEditVenc').classList.add('d-none');
+                }
+            }
+        }
     });
 </script>
-

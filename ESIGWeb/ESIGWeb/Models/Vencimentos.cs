@@ -14,5 +14,6 @@ namespace ESIGWeb.Models
         public string Tipo { get; set; }
         public List<CargoVencimento> CargoVencimento { get; set; }
 
+
     }
 }

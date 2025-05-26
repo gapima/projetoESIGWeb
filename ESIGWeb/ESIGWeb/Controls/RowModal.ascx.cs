@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Web.UI;
-using ESIGWeb.Data;
+using ESIGWeb.Services;
 using ESIGWeb.Models;
-using Microsoft.Ajax.Utilities;
+using ESIGWeb.Utils; // <== Import dos utilitários!
+using System.Collections.Generic;
 
 namespace ESIGWeb.Controls
 {
     public partial class RowModal : UserControl, IPostBackEventHandler
     {
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-        }
+        private readonly PessoaService _pessoaService = new PessoaService();
+
         public async void RaisePostBackEvent(string eventArgument)
         {
-            if (!int.TryParse(eventArgument, out var pessoaId))
+            int pessoaId = ConversionUtils.ToIntSafe(eventArgument);
+            if (pessoaId == 0)
                 return;
 
-            var p = await DatabaseHelper.ObterPessoaAsync(pessoaId);
+            var p = await _pessoaService.ObterPessoaAsync(pessoaId);
             if (p == null)
                 return;
 
@@ -26,7 +26,6 @@ namespace ESIGWeb.Controls
             txtDataNascimento.Text = p.DataNascimento.ToString("yyyy-MM-dd");
             txtEmail.Text = p.Email;
             txtUsuario.Text = p.Usuario;
-
             txtCidade.Text = p.Cidade;
             txtCEP.Text = p.CEP;
             txtCEP.Attributes["data-initial-cep"] = p.CEP;
@@ -34,11 +33,8 @@ namespace ESIGWeb.Controls
             txtPais.Text = p.Pais;
             txtTelefone.Text = p.Telefone;
 
-            var dt = await DatabaseHelper.ObterTodosCargosAsync();
-            ddlCargo.DataSource = dt;
-            ddlCargo.DataValueField = "id";
-            ddlCargo.DataTextField = "nome";
-            ddlCargo.DataBind();
+            var dt = await _pessoaService.ObterTodosCargosAsync();
+            UIUtils.BindDropDownList(ddlCargo, dt, "id", "nome");
             if (ddlCargo.Items.FindByValue(p.CargoId.ToString()) != null)
                 ddlCargo.SelectedValue = p.CargoId.ToString();
 
@@ -48,81 +44,76 @@ namespace ESIGWeb.Controls
             gridDebitos.DataSource = p.Debitos;
             gridDebitos.DataBind();
 
-            Page.ClientScript.RegisterStartupScript(
-                GetType(),
-                "showRowModal",
-                "new bootstrap.Modal(document.getElementById('rowModal')).show();",
-                true
-            );
+            ScriptUtils.ShowModal(Page, "rowModal");
         }
+
         protected async void ddlCargo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (int.TryParse(ddlCargo.SelectedValue, out var novoCargoId))
+            int novoCargoId = ConversionUtils.ToIntSafe(ddlCargo.SelectedValue);
+            if (novoCargoId > 0)
             {
-                var creditos = await DatabaseHelper.ObterDadosFinanceiroPessoaAsync(novoCargoId, "C");
+                var creditos = await _pessoaService.ObterCreditosPorCargoAsync(novoCargoId);
                 gridCreditos.DataSource = creditos;
                 gridCreditos.DataBind();
 
-                var debitos = await DatabaseHelper.ObterDadosFinanceiroPessoaAsync(novoCargoId, "D");
+                var debitos = await _pessoaService.ObterDebitosPorCargoAsync(novoCargoId);
                 gridDebitos.DataSource = debitos;
                 gridDebitos.DataBind();
             }
 
             updRowModalBody.Update();
-            ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                "showRowModal",
-                "var modalEl = document.getElementById('rowModal'); if(modalEl){var m=bootstrap.Modal.getOrCreateInstance(modalEl);m.show();}",
-                true
-            );
+            ScriptUtils.ShowModal(Page, "rowModal");
         }
-        protected async void btnSavePessoa_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var p = new Pessoa
-                {
-                    Id = !txtPessoaId.Text.IsNullOrWhiteSpace() ? int.Parse(txtPessoaId.Text) : 0,
-                    Nome = txtPessoaNome.Text,
-                    DataNascimento = DateTime.Parse(txtDataNascimento.Text),
-                    Email = txtEmail.Text,
-                    Usuario = txtUsuario.Text,
-                    Cidade = txtCidade.Text,
-                    CEP = txtCEP.Text,
-                    Endereco = txtEndereco.Text,
-                    Pais = txtPais.Text,
-                    Telefone = txtTelefone.Text,
-                    CargoId = int.Parse(ddlCargo.SelectedValue)
-                };
+protected async void btnSavePessoa_Click(object sender, EventArgs e)
+{
+    try
+    {
+        List<string> erros;
+        var pessoa = ValidationUtils.TryParsePessoa(
+            txtPessoaId.Text,
+            txtPessoaNome.Text,
+            txtDataNascimento.Text,
+            txtEmail.Text,
+            txtUsuario.Text,
+            txtCidade.Text,
+            txtCEP.Text,
+            txtEndereco.Text,
+            txtPais.Text,
+            txtTelefone.Text,
+            ddlCargo.SelectedValue,
+            out erros
+        );
 
-                if (p.Id == 0)
-                {
-                    await DatabaseHelper.InserirPessoaAsync(p);
-                }
-                else
-                {
-                    await DatabaseHelper.SalvarPessoaAsync(p);
-                }
-                Session["MensagemGlobal"] = "Dados salvo com sucesso!";
-                Session["MensagemGlobalTipo"] = "sucesso";
-                Response.Redirect("Listagem.aspx", false);
-            }
-            catch (Exception ex)
-            {
-                Session["MensagemGlobal"] = "Erro ao salvar dados: " + ex.Message;
-                Session["MensagemGlobalTipo"] = "erro";
-                Response.Redirect("Listagem.aspx", false);
-            }
+        if (erros.Count > 0)
+        {
+            // Monta a mensagem de erro para o usuário (pode ser com <br/> para múltiplos erros)
+            string mensagem = "Erros ao salvar:<br/>" + string.Join("<br/>", erros);
+            WebUtils.SetMensagemGlobal(mensagem, "erro");
+            ScriptUtils.ShowModal(Page, "rowModal"); // Mantém o modal aberto para correção
+            return;
         }
+
+        await _pessoaService.SalvarPessoaAsync(pessoa);
+        WebUtils.SetMensagemGlobal("Dados salvo com sucesso!", "sucesso");
+        Response.Redirect("Listagem.aspx", false);
+    }
+    catch (Exception ex)
+    {
+        WebUtils.SetMensagemGlobal("Erro ao salvar dados: " + ex.Message, "erro");
+        Response.Redirect("Listagem.aspx", false);
+    }
+}
+
+
         protected async void btnDeletePessoa_Click(object sender, EventArgs e)
         {
             try
             {
-                if (!int.TryParse(txtPessoaId.Text, out var pessoaId))
+                int pessoaId = ConversionUtils.ToIntSafe(txtPessoaId.Text);
+                if (pessoaId == 0)
                     return;
 
-                await DatabaseHelper.ExcluirPessoaAsync(pessoaId);
+                await _pessoaService.ExcluirPessoaAsync(pessoaId);
 
                 var btnCalc = Page.FindControl("btnCalcular") as System.Web.UI.WebControls.Button;
                 string postbackRef = btnCalc != null
@@ -142,14 +133,12 @@ namespace ESIGWeb.Controls
                     script,
                     true
                 );
-                Session["MensagemGlobal"] = "Pessoa excluida com sucesso!";
-                Session["MensagemGlobalTipo"] = "sucesso";
+                WebUtils.SetMensagemGlobal("Pessoa excluida com sucesso!", "sucesso");
                 Response.Redirect("Listagem.aspx", false);
             }
             catch (Exception ex)
             {
-                Session["MensagemGlobal"] = "Erro ao excluir pessoa: " + ex.Message;
-                Session["MensagemGlobalTipo"] = "erro";
+                WebUtils.SetMensagemGlobal("Erro ao excluir pessoa: " + ex.Message, "erro");
                 Response.Redirect("Listagem.aspx", false);
             }
         }

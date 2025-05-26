@@ -23,7 +23,7 @@ namespace ESIGWeb.Pages
                 // var dt = DatabaseHelper.GetViewDataAsync().Result;
 
                 ReportDocument rptDoc = new ReportDocument();
-                rptDoc.Load(Server.MapPath("~/RelatorioSalarioCalc.rpt"));
+                rptDoc.Load(Server.MapPath("~/Reports/RelatorioSalarioCalc.rpt"));
 
                 rptDoc.SetDataSource(dt);
 

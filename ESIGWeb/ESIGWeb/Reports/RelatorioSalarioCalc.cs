@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ESIGWeb {
+namespace ESIGWeb.Reports {
     using System;
     using System.ComponentModel;
     using CrystalDecisions.Shared;
@@ -41,7 +41,7 @@ namespace ESIGWeb {
         
         public override string FullResourceName {
             get {
-                return "ESIGWeb.RelatorioSalarioCalc.rpt";
+                return "ESIGWeb.Reports.RelatorioSalarioCalc.rpt";
             }
             set {
                 // Do nothing

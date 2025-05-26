@@ -1,5 +1,6 @@
-﻿using ESIGWeb.Data;
-using ESIGWeb.Models;
+﻿using ESIGWeb.Models;
+using ESIGWeb.Services;
+using ESIGWeb.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,17 +11,19 @@ using System.Web.UI.WebControls;
 
 namespace ESIGWeb.Controls
 {
-
     public partial class VincularVencimentosModal : UserControl
     {
+        private readonly VencimentoService _vencimentoService = new VencimentoService();
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
                 CarregarDropdownsAsync();
         }
+
         public async Task CarregarDropdownsAsync()
         {
-            ddlVencimentos.DataSource = await DatabaseHelper.ObterTodosVencimentosAsync();
+            ddlVencimentos.DataSource = await _vencimentoService.ObterTodosVencimentosAsync();
             ddlVencimentos.DataTextField = "Descricao";
             ddlVencimentos.DataValueField = "Id";
             ddlVencimentos.DataBind();
@@ -28,31 +31,31 @@ namespace ESIGWeb.Controls
 
             await PreencherCargosAsync();
         }
+
         protected async void ddlVencimentos_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (int.TryParse(ddlVencimentos.SelectedValue, out var vid))
+            int vid = ConversionUtils.ToIntSafe(ddlVencimentos.SelectedValue);
+            if (vid > 0)
             {
-                var v = await DatabaseHelper.ObterVencimentoPorIdAsync(vid);
+                var v = await _vencimentoService.ObterVencimentoPorIdAsync(vid);
                 txtValor.Text = v.Valor.ToString("F2");
                 ddlForma.SelectedValue = v.FormaIncidencia;
                 ddlTipo.SelectedValue = v.Tipo;
             }
             await PreencherCargosAsync();
-            ScriptManager.RegisterStartupScript(
-                this, GetType(),
-                "showVincular",
-                "new bootstrap.Modal(document.getElementById('vincularVencModal')).show();",
-                true);
+            ScriptUtils.ShowModal(Page, "vincularVencModal");
         }
+
         private async Task PreencherCargosAsync()
         {
-            var todosDt = await DatabaseHelper.ObterTodosCargosAsync();
+            var todosDt = await _vencimentoService.ObterTodosCargosAsync();
             var todasRows = todosDt.Rows.Cast<DataRow>();
 
             var vinculados = new HashSet<int>();
-            if (int.TryParse(ddlVencimentos.SelectedValue, out var vid))
+            int vid = ConversionUtils.ToIntSafe(ddlVencimentos.SelectedValue);
+            if (vid > 0)
             {
-                var cargosVinc = await DatabaseHelper.ObterCargosVinculadosAsync(vid);
+                var cargosVinc = await _vencimentoService.ObterCargosVinculadosAsync(vid);
                 foreach (var cv in cargosVinc)
                     vinculados.Add(cv.CargoId);
             }
@@ -69,125 +72,128 @@ namespace ESIGWeb.Controls
             rptCargos.DataSource = lista;
             rptCargos.DataBind();
         }
+
         protected async void btnSalvarVinc_Click(object sender, EventArgs e)
         {
             try
             {
-                if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
+                // Validação centralizada para vencimento (edição)
+                List<string> erros;
+                var venc = ValidationUtils.TryParseVencimento(
+                    id: ddlVencimentos.SelectedValue,
+                    descricao: null, // Não edita descrição aqui, então pode ser null
+                    valor: txtValor.Text,
+                    formaIncidencia: ddlForma.SelectedValue,
+                    tipo: ddlTipo.SelectedValue,
+                    out erros
+                );
+
+                if (erros.Count > 0)
+                {
+                    WebUtils.SetMensagemGlobal("Erros ao salvar:<br/>" + string.Join("<br/>", erros), "erro");
+                    ScriptUtils.ShowModal(Page, "vincularVencModal");
                     return;
+                }
 
                 var valores = Request.Form.GetValues("chkCargo");
                 var selecionados = new HashSet<int>();
                 if (valores != null)
                 {
                     foreach (var s in valores)
-                        if (int.TryParse(s, out var i))
-                            selecionados.Add(i);
+                        selecionados.Add(ConversionUtils.ToIntSafe(s));
                 }
 
-                var v = new Vencimentos
-                {
-                    Id = vid,
-                    Valor = decimal.Parse(txtValor.Text),
-                    FormaIncidencia = ddlForma.SelectedValue,
-                    Tipo = ddlTipo.SelectedValue
-                };
-                await DatabaseHelper.AtualizarVencimentoAsync(v);
+                await _vencimentoService.AtualizarVencimentoAsync(venc);
 
-                var todosDt = await DatabaseHelper.ObterTodosCargosAsync();
-                var todosIds = todosDt.Rows
-                    .Cast<DataRow>()
-                    .Select(r => Convert.ToInt32(r["id"]));
+                var todosDt = await _vencimentoService.ObterTodosCargosAsync();
+                var todosIds = todosDt.Rows.Cast<DataRow>().Select(r => Convert.ToInt32(r["id"]));
 
                 foreach (var cid in todosIds)
                 {
                     if (selecionados.Contains(cid))
-                        await DatabaseHelper.VincularCargoAsync(vid, cid);
+                        await _vencimentoService.VincularCargoAsync(venc.Id, cid);
                     else
-                        await DatabaseHelper.DesvincularCargoAsync(vid, cid);
+                        await _vencimentoService.DesvincularCargoAsync(venc.Id, cid);
                 }
                 await CarregarDropdownsAsync();
 
-                ScriptManager.RegisterStartupScript(
-                    this, GetType(), "closeVinc",
-                    "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
-                    true);
-                Session["MensagemGlobal"] = "Vencimento salvo com sucesso!";
-                Session["MensagemGlobalTipo"] = "sucesso";
+                ScriptUtils.HideModal(Page, "vincularVencModal");
+                WebUtils.SetMensagemGlobal("Vencimento salvo com sucesso!", "sucesso");
                 Response.Redirect("Listagem.aspx", false);
             }
             catch (Exception ex)
             {
-                Session["MensagemGlobal"] = "Erro ao salvar vencimento: " + ex.Message;
-                Session["MensagemGlobalTipo"] = "erro";
+                WebUtils.SetMensagemGlobal("Erro ao salvar vencimento: " + ex.Message, "erro");
                 Response.Redirect("Listagem.aspx", false);
             }
         }
+
         protected async void btnExcluirVinc_Click(object sender, EventArgs e)
         {
             try
             {
-                if (!int.TryParse(ddlVencimentos.SelectedValue, out var vid))
+                int vid = ConversionUtils.ToIntSafe(ddlVencimentos.SelectedValue);
+                if (vid == 0)
                     return;
 
-                var cargosVinc = await DatabaseHelper.ObterCargosVinculadosAsync(vid);
+                var cargosVinc = await _vencimentoService.ObterCargosVinculadosAsync(vid);
                 foreach (var cv in cargosVinc)
-                    await DatabaseHelper.DesvincularCargoAsync(vid, cv.CargoId);
+                    await _vencimentoService.DesvincularCargoAsync(vid, cv.CargoId);
 
-                await DatabaseHelper.ExcluirVencimentoAsync(vid);
+                await _vencimentoService.ExcluirVencimentoAsync(vid);
                 await CarregarDropdownsAsync();
 
-                ScriptManager.RegisterStartupScript(
-                    this, GetType(), "closeVinc",
-                    "new bootstrap.Modal(document.getElementById('vincularVencModal')).hide();",
-                    true);
-
-                Session["MensagemGlobal"] = "Vencimento excluído com sucesso!";
-                Session["MensagemGlobalTipo"] = "sucesso";
+                ScriptUtils.HideModal(Page, "vincularVencModal");
+                WebUtils.SetMensagemGlobal("Vencimento excluído com sucesso!", "sucesso");
                 Response.Redirect("Listagem.aspx", false);
             }
             catch (Exception ex)
             {
-                Session["MensagemGlobal"] = "Erro ao excluir vencimento: " + ex.Message;
-                Session["MensagemGlobalTipo"] = "erro";
+                WebUtils.SetMensagemGlobal("Erro ao excluir vencimento: " + ex.Message, "erro");
                 Response.Redirect("Listagem.aspx", false);
             }
         }
+
         protected async void btnSalvarNovo_Click(object sender, EventArgs e)
         {
             try
             {
-                var v = new Vencimentos
+                // Validação centralizada para novo vencimento
+                List<string> erros;
+                var venc = ValidationUtils.TryParseVencimento(
+                    id: null,
+                    descricao: txtDescNovo.Text,
+                    valor: txtValorNovo.Text,
+                    formaIncidencia: ddlFormaNovo.SelectedValue,
+                    tipo: ddlTipoNovo.SelectedValue,
+                    out erros
+                );
+
+                if (erros.Count > 0)
                 {
-                    Descricao = txtDescNovo.Text.Trim(),
-                    Valor = decimal.Parse(txtValorNovo.Text),
-                    FormaIncidencia = ddlFormaNovo.SelectedValue,
-                    Tipo = ddlTipoNovo.SelectedValue
-                };
-                await DatabaseHelper.InserirVencimentoAsync(v);
+                    WebUtils.SetMensagemGlobal("Erros ao salvar:<br/>" + string.Join("<br/>", erros), "erro");
+                    ScriptUtils.ShowModal(Page, "novoVencModal");
+                    return;
+                }
+
+                await _vencimentoService.InserirVencimentoAsync(venc);
                 await CarregarDropdownsAsync();
 
-                var script = $@"
-                  bootstrap.Modal.getInstance(
-                    document.getElementById('{novoVencModal.ClientID}')
-                  ).hide();
-
-                  setTimeout(function(){{
-                    new bootstrap.Modal(
-                      document.getElementById('{vincularVencModal.ClientID}')
-                    ).show();
-                  }}, 200);
+                // Troca de modal com JS custom
+                string script = $@"
+                    bootstrap.Modal.getInstance(document.getElementById('{novoVencModal.ClientID}')).hide();
+                    setTimeout(function(){{
+                        new bootstrap.Modal(document.getElementById('{vincularVencModal.ClientID}')).show();
+                    }}, 200);
                 ";
                 ScriptManager.RegisterStartupScript(this, GetType(), "afterNovoVenc", script, true);
 
-                Session["MensagemGlobal"] = "Novo vencimento salvo com sucesso!";
-                Session["MensagemGlobalTipo"] = "sucesso";
+                WebUtils.SetMensagemGlobal("Novo vencimento salvo com sucesso!", "sucesso");
                 Response.Redirect("Listagem.aspx", false);
             }
             catch (Exception ex)
             {
-                Session["MensagemGlobal"] = "Erro ao salvar novo vencimento: " + ex.Message;
-                Session["MensagemGlobalTipo"] = "erro";
+                WebUtils.SetMensagemGlobal("Erro ao salvar novo vencimento: " + ex.Message, "erro");
                 Response.Redirect("Listagem.aspx", false);
             }
         }
