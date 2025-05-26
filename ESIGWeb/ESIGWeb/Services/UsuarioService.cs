@@ -12,5 +12,15 @@ namespace ESIGWeb.Services
         {
             return await _repo.ObterPorLoginSenhaAsync(login, senha);
         }
+
+        public async Task<bool> UsuarioExisteAsync(string login, string email)
+        {
+            return await _repo.UsuarioExisteAsync(login, email);
+        }
+
+        public async Task<bool> InserirUsuarioAsync(Usuario usuario)
+        {
+            return await _repo.InserirUsuarioAsync(usuario);
+        }
     }
 }

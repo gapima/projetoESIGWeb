@@ -45,7 +45,20 @@
     </style>
 </head>
 <body>
+
     <form id="form1" runat="server">
+    <!-- Toast de mensagem global -->
+    <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 60px;">
+      <div id="globalToast" class="toast align-items-center text-bg-success border-0"
+           role="alert" aria-live="assertive" aria-atomic="true"
+           style="position: absolute; top: 10px; right: 10px; min-width: 250px; z-index: 9999; display:none;">
+        <div class="d-flex">
+          <div class="toast-body" id="globalToastMsg">Sucesso!</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                  data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
         <asp:ScriptManager runat="server" />
         <div class="login-card mx-auto">
             <div class="login-title">Acesso ao Sistema</div>
