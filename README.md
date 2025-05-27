@@ -102,8 +102,6 @@ xml
 
 ## 📷 Exemplos de Telas
 
-## 📷 Exemplos de Telas
-
 ### Listagem de Pessoas e Salários
 ![Listagem](/prints/listagem.png)
 
