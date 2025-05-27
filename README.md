@@ -9,7 +9,7 @@ Este projeto foi desenvolvido como parte do processo seletivo para Pessoa Desenv
 1. **Criação do Banco de Dados Oracle**
 
    * Desenvolvi scripts SQL para criação das 6 tabelas principais (cargo, vencimentos, pessoa, cargo_vencimentos, pessoa_salario, usuario), respeitando a ordem das constraints, além da procedure SP_CALCULAR_SALARIOS e da view VW_RELATORIO_SALARIOS.
-    **Scrips ja tem os inserts para popular a tabela com dados do excel enviado.**
+    **Estao na pasta /script oracle/ Scrips ja tem os inserts para popular a tabela com dados do excel enviado.**
      
 2. **Tela de Login e Cadastro de Usuário**
 
@@ -22,7 +22,7 @@ Este projeto foi desenvolvido como parte do processo seletivo para Pessoa Desenv
 
 4. **Cálculo de Salários via Procedure Oracle**
 
-   * - Implementei a integração para executar a procedure `SP_CALCULAR_SALARIOS` de forma assíncrona, automatizando o preenchimento da tabela `pessoa_salario` após qualquer alteração relevante (como edição de créditos/débitos).
+   * Implementei a integração para executar a procedure `SP_CALCULAR_SALARIOS` de forma assíncrona, automatizando o preenchimento da tabela `pessoa_salario` após qualquer alteração relevante (como edição de créditos/débitos).
    - **Todo o processamento do sistema foi projetado utilizando métodos assíncronos (`async`/`await`), incluindo todas as operações de CRUD, consultas, chamadas de procedures e carregamento de dados, proporcionando maior desempenho e melhor experiência do usuário, especialmente com grandes volumes de dados.**
 
 5. **Vinculação de Créditos/Débitos**
@@ -56,7 +56,7 @@ Este projeto foi desenvolvido como parte do processo seletivo para Pessoa Desenv
 * **Design Responsivo e Moderno**
   Utilizei Bootstrap para garantir uma interface responsiva e agradável.
 
-  * **Validação de CEP por API**  
+* **Validação de CEP por API**  
   Para validar automaticamente o CEP informado no cadastro de pessoas, utilizei a [BrasilAPI - Consulta CEP](https://brasilapi.com.br/api/cep/v1/08543070).
 
 
